@@ -1,32 +1,32 @@
 #pragma once
 
 #ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN            // ´Ó Windows Í·ÖÐÅÅ³ý¼«ÉÙÊ¹ÓÃµÄ×ÊÁÏ
+#define VC_EXTRALEAN            // 从 Windows 头中排除极少使用的资料
 #endif
 
 #include "targetver.h"
 
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // Ä³Ð© CString ¹¹Ôìº¯Êý½«ÊÇÏÔÊ½µÄ
+#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // 某些 CString 构造函数将是显式的
 
-// ¹Ø±Õ MFC µÄÒ»Ð©³£¼ûÇÒ¾­³£¿É·ÅÐÄºöÂÔµÄÒþ²Ø¾¯¸æÏûÏ¢
+// 关闭 MFC 的一些常见且经常可放心忽略的隐藏警告消息
 #define _AFX_ALL_WARNINGS
 
-#include <afxwin.h>         // MFC ºËÐÄ×é¼þºÍ±ê×¼×é¼þ
-#include <afxext.h>         // MFC À©Õ¹
+#include <afxwin.h>         // MFC 核心组件和标准组件
+#include <afxext.h>         // MFC 扩展
 
 
-#include <afxdisp.h>        // MFC ×Ô¶¯»¯Àà
+#include <afxdisp.h>        // MFC 自动化类
 
 
 
 #ifndef _AFX_NO_OLE_SUPPORT
-#include <afxdtctl.h>           // MFC ¶Ô Internet Explorer 4 ¹«¹²¿Ø¼þµÄÖ§³Ö
+#include <afxdtctl.h>           // MFC 对 Internet Explorer 4 公共控件的支持
 #endif
 #ifndef _AFX_NO_AFXCMN_SUPPORT
-#include <afxcmn.h>             // MFC ¶Ô Windows ¹«¹²¿Ø¼þµÄÖ§³Ö
+#include <afxcmn.h>             // MFC 对 Windows 公共控件的支持
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
-#include <afxcontrolbars.h>     // MFC Ö§³Ö¹¦ÄÜÇøºÍ¿ØÖÆÌõ
+#include <afxcontrolbars.h>     // MFC 支持功能区和控制条
 
 
 
