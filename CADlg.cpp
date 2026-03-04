@@ -8,7 +8,7 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
-#endif
+#endif  
 
 // 主对话框模块 / main dialog module
 // 下面函数在本文件被调用前的用法说明：

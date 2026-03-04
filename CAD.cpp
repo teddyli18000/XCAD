@@ -33,17 +33,14 @@ CCADApp::CCADApp()
 CCADApp theApp;
 
 
-// CCADApp ³õÊ¼»¯
+// app init / 应用初始化
 
 BOOL CCADApp::InitInstance()
 {
-	// Èç¹ûÓ¦ÓÃ³ÌÐò´æÔÚÒÔÏÂÇé¿ö£¬Windows XP ÉÏÐèÒª InitCommonControlsEx()
-	// Ê¹ÓÃ ComCtl32.dll °æ±¾ 6 »ò¸ü¸ß°æ±¾À´ÆôÓÃ¿ÉÊÓ»¯·½Ê½£¬
-	//ÔòÐèÒª InitCommonControlsEx()¡£  ·ñÔò£¬½«ÎÞ·¨´´½¨´°¿Ú¡£
+	// init common controls / 初始化通用控件
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
-	// ½«ËüÉèÖÃÎª°üÀ¨ËùÓÐÒªÔÚÓ¦ÓÃ³ÌÐòÖÐÊ¹ÓÃµÄ
-	// ¹«¹²¿Ø¼þÀà¡£
+	// Win95 control classes / Win95 控件类
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
