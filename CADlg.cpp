@@ -104,8 +104,33 @@ BOOL CCADDlg::OnInitDialog() {
         GetDlgItem(IDC_DRAW_AREA)->ShowWindow(SW_HIDE);
     }
 
+    UpdateModeButtonHighlight();
     FocusCommandLine();
     return FALSE;
+}
+
+void CCADDlg::UpdateModeButtonHighlight() {
+    auto setPushed = [this](int ctrlId, bool pushed) {
+        CWnd* button = GetDlgItem(ctrlId);
+        if (!button || !::IsWindow(button->GetSafeHwnd())) return;
+        button->SendMessage(BM_SETSTATE, pushed ? TRUE : FALSE, 0);
+    };
+
+    const bool lineActive = (m_currentMode == CADMode::MODE_DRAW && m_bLineCommandActive);
+    const bool circleActive = (m_currentMode == CADMode::MODE_DRAW && m_bCircleCommandActive);
+    const bool rectActive = (m_currentMode == CADMode::MODE_DRAW && m_bRectangleCommandActive);
+    const bool arcActive = (m_currentMode == CADMode::MODE_DRAW && m_bArcCommandActive);
+    const bool drawModeActive = lineActive || circleActive || rectActive || arcActive;
+    const bool eraseActive = (m_currentMode == CADMode::MODE_SELECT && m_bEraserCommandActive);
+    const bool selectModeActive = (m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive);
+
+    setPushed(IDC_DRAW, drawModeActive);
+    setPushed(IDC_DRAW_LINE, lineActive);
+    setPushed(IDC_DRAW_CIRCLE, circleActive);
+    setPushed(IDC_DRAW_RECT, rectActive);
+    setPushed(IDC_DRAW_ARC, arcActive);
+    setPushed(IDC_SEL, selectModeActive);
+    setPushed(IDC_DEL_LINE, eraseActive);
 }
 
 void CCADDlg::OnSetFocus(CWnd* pOldWnd) {
@@ -168,6 +193,7 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
         m_bEraserCommandActive = true;
     }
 
+    UpdateModeButtonHighlight();
     RefreshCanvas();
     FocusCommandLine();
 }
@@ -212,6 +238,7 @@ void CCADDlg::OnBnClickedArc() {
 void CCADDlg::OnBnClickedSel() {
     m_currentMode = CADMode::MODE_SELECT;
     CancelCurrentDrawing();
+    UpdateModeButtonHighlight();
 }
 
 void CCADDlg::OnBnClickedViewPoint() {

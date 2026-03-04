@@ -244,6 +244,7 @@ void CCADDlg::FinishCurrentDrawing(bool keepCommandActive) {
     m_bRectangleFirstPicked = false;
     m_bArcCommandActive = false;
     m_arcPointCount = 0;
+    UpdateModeButtonHighlight();
     RefreshCanvas();
     FocusCommandLine();
 }
@@ -266,6 +267,7 @@ void CCADDlg::CancelCurrentDrawing() {
         ReleaseCapture();
     }
     ClearSelection();
+    UpdateModeButtonHighlight();
     RefreshCanvas();
     FocusCommandLine();
 }
@@ -297,6 +299,7 @@ void CCADDlg::CancelActiveCommand() {
         ReleaseCapture();
     }
 
+    UpdateModeButtonHighlight();
     RefreshCanvas();
     FocusCommandLine();
 }

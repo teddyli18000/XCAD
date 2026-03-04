@@ -124,6 +124,7 @@ protected:
 	void ApplySelectionBox();
 	void DeleteSelectedLines();
 	void EraseAtPoint(const CPoint& localPt);
+	void UpdateModeButtonHighlight();
 
 	DECLARE_MESSAGE_MAP()
 };
