@@ -212,6 +212,12 @@
     <ClCompile Include="Draw_canvas\CADlgDrawModel.cpp" />
     <ClCompile Include="Draw_canvas\CADlgDrawPreview.cpp" />
     <ClCompile Include="Draw_canvas\CADlgDrawSelection.cpp" />
+    <ClCompile Include="Draw_tools\ArcTool.cpp" />
+    <ClCompile Include="Draw_tools\CircleTool.cpp" />
+    <ClCompile Include="Draw_tools\EraserTool.cpp" />
+    <ClCompile Include="Draw_tools\LineTool.cpp" />
+    <ClCompile Include="Draw_tools\RectTool.cpp" />
+    <ClCompile Include="Draw_tools\SelectionTool.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

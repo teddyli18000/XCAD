@@ -128,6 +128,20 @@ protected:
 	void DrawPreview(CDC* pDC);
 	void DrawSelection(CDC* pDC);
 	void DrawCursor(CDC* pDC);
+	bool HandleLineToolLButtonDown(const Point2D& worldPt);
+	bool HandleLineToolMouseMove(const Point2D& worldPt);
+	bool HandleCircleToolLButtonDown(const Point2D& worldPt);
+	bool HandleCircleToolMouseMove(const Point2D& worldPt);
+	bool HandleRectToolLButtonDown(const Point2D& worldPt);
+	bool HandleRectToolMouseMove(const Point2D& worldPt);
+	bool HandleArcToolLButtonDown(const Point2D& worldPt);
+	bool HandleArcToolMouseMove(const Point2D& worldPt);
+	bool HandleSelectionToolLButtonDown(const CPoint& localPt);
+	bool HandleSelectionToolMouseMove(const CPoint& localPt);
+	bool HandleSelectionToolLButtonUp(const CPoint& localPt);
+	bool HandleEraserToolLButtonDown(const CPoint& localPt);
+	bool HandleEraserToolMouseMove(UINT nFlags, const CPoint& localPt, bool inCanvas);
+	bool HandleEraserToolLButtonUp();
 	void UpdateModeButtonHighlight();
 
 	DECLARE_MESSAGE_MAP()
