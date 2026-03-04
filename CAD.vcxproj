@@ -204,6 +204,7 @@
     <ClCompile Include="CAD.cpp" />
     <ClCompile Include="CADlg.cpp" />
     <ClCompile Include="CADlgGeometryUtils.cpp" />
+    <ClCompile Include="CADlgRendering.cpp" />
     <ClCompile Include="CADlgSelection.cpp" />
     <ClCompile Include="CADlgShapeFactory.cpp" />
     <ClCompile Include="Commands.cpp" />
@@ -216,6 +217,9 @@
     <ClCompile Include="ShapeManager.cpp" />
     <ClCompile Include="Shapes.cpp" />
     <ClCompile Include="ViewTransform.cpp" />
+    <ClCompile Include="CADlgInput.cpp" />
+    <ClCompile Include="CADlgCommandLine.cpp" />
+    <ClCompile Include="CADlgRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CAD.rc" />
@@ -231,4 +235,3 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
-
