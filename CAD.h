@@ -1,30 +1,26 @@
-
-// CAD.h: PROJECT_NAME Ó¦ÓÃ³ÌÐòµÄÖ÷Í·ÎÄ¼þ
-//
+// CAD app header / 应用头文件
 
 #pragma once
 
 #ifndef __AFXWIN_H__
-	#error "ÔÚ°üº¬´ËÎÄ¼þÖ®Ç°°üº¬ 'pch.h' ÒÔÉú³É PCH"
+	#error "include 'pch.h' before this file / 先包含 pch.h"
 #endif
 
-#include "resource.h"		// Ö÷·ûºÅ
+#include "resource.h"		// resources / 资源
 
 
-// CCADApp:
-// ÓÐ¹Ø´ËÀàµÄÊµÏÖ£¬Çë²ÎÔÄ CAD.cpp
-//
+// CCADApp / 应用类
 
 class CCADApp : public CWinApp
 {
 public:
 	CCADApp();
 
-// ÖØÐ´
+// override / 重写
 public:
 	virtual BOOL InitInstance();
 
-// ÊµÏÖ
+// impl / 实现
 
 	DECLARE_MESSAGE_MAP()
 };

@@ -2,10 +2,10 @@
 #include "framework.h"
 #include "CAD.h"
 #include "CADDlg.h"
+#include "CADlgGeometryUtils.h"
 #include "afxdialogex.h"
 
 #include <afxdlgs.h>
-#include <algorithm>
 #include <cmath>
 #include <memory>
 #include <vector>
@@ -14,134 +14,16 @@
 #define new DEBUG_NEW
 #endif
 
-namespace {
-double NormalizeAngle(double angle) {
-    const double twoPi = 6.28318530717958647692;
-    while (angle < 0.0) angle += twoPi;
-    while (angle >= twoPi) angle -= twoPi;
-    return angle;
-}
-
-double AngleDistanceCCW(double from, double to) {
-    double f = NormalizeAngle(from);
-    double t = NormalizeAngle(to);
-    if (t >= f) return t - f;
-    return (6.28318530717958647692 - f) + t;
-}
-
-CRect NormalizeRect(const CPoint& a, const CPoint& b) {
-    CRect rect(a, b);
-    rect.NormalizeRect();
-    return rect;
-}
-
-bool IsPointInRect(const CPoint& pt, const CRect& rect) {
-    return pt.x >= rect.left && pt.x <= rect.right && pt.y >= rect.top && pt.y <= rect.bottom;
-}
-
-bool SegmentsIntersect(const CPoint& p1, const CPoint& p2, const CPoint& q1, const CPoint& q2) {
-    auto cross = [](const CPoint& a, const CPoint& b, const CPoint& c) {
-        return static_cast<double>(b.x - a.x) * static_cast<double>(c.y - a.y)
-            - static_cast<double>(b.y - a.y) * static_cast<double>(c.x - a.x);
-    };
-    auto onSegment = [](const CPoint& a, const CPoint& b, const CPoint& c) {
-        return (std::min)(a.x, b.x) <= c.x && c.x <= (std::max)(a.x, b.x)
-            && (std::min)(a.y, b.y) <= c.y && c.y <= (std::max)(a.y, b.y);
-    };
-
-    double d1 = cross(p1, p2, q1);
-    double d2 = cross(p1, p2, q2);
-    double d3 = cross(q1, q2, p1);
-    double d4 = cross(q1, q2, p2);
-
-    if (((d1 > 0.0 && d2 < 0.0) || (d1 < 0.0 && d2 > 0.0)) && ((d3 > 0.0 && d4 < 0.0) || (d3 < 0.0 && d4 > 0.0))) {
-        return true;
-    }
-
-    const double eps = 1e-9;
-    if (std::fabs(d1) <= eps && onSegment(p1, p2, q1)) return true;
-    if (std::fabs(d2) <= eps && onSegment(p1, p2, q2)) return true;
-    if (std::fabs(d3) <= eps && onSegment(q1, q2, p1)) return true;
-    if (std::fabs(d4) <= eps && onSegment(q1, q2, p2)) return true;
-    return false;
-}
-
-bool PolylineIntersectsRect(const CLine& line, const CRect& rect, const CViewTransform& transform) {
-    const auto& pts = line.GetPoints();
-    if (pts.empty()) return false;
-
-    std::vector<CPoint> screenPts;
-    screenPts.reserve(pts.size());
-    for (const auto& p : pts) {
-        screenPts.push_back(transform.WorldToScreen(p));
-    }
-
-    for (const auto& p : screenPts) {
-        if (IsPointInRect(p, rect)) return true;
-    }
-
-    CPoint r1(rect.left, rect.top);
-    CPoint r2(rect.right, rect.top);
-    CPoint r3(rect.right, rect.bottom);
-    CPoint r4(rect.left, rect.bottom);
-
-    for (size_t i = 1; i < screenPts.size(); ++i) {
-        const CPoint& a = screenPts[i - 1];
-        const CPoint& b = screenPts[i];
-        if (SegmentsIntersect(a, b, r1, r2) || SegmentsIntersect(a, b, r2, r3) ||
-            SegmentsIntersect(a, b, r3, r4) || SegmentsIntersect(a, b, r4, r1)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-double DistancePointToSegmentSquared(const CPoint& p, const CPoint& a, const CPoint& b) {
-    const double dx = static_cast<double>(b.x - a.x);
-    const double dy = static_cast<double>(b.y - a.y);
-    const double len2 = dx * dx + dy * dy;
-    if (len2 < 1e-9) {
-        const double px = static_cast<double>(p.x - a.x);
-        const double py = static_cast<double>(p.y - a.y);
-        return px * px + py * py;
-    }
-
-    double t = (static_cast<double>(p.x - a.x) * dx + static_cast<double>(p.y - a.y) * dy) / len2;
-    t = (std::max)(0.0, (std::min)(1.0, t));
-    const double projX = static_cast<double>(a.x) + t * dx;
-    const double projY = static_cast<double>(a.y) + t * dy;
-    const double ddx = static_cast<double>(p.x) - projX;
-    const double ddy = static_cast<double>(p.y) - projY;
-    return ddx * ddx + ddy * ddy;
-}
-
-bool PolylineIntersectsCircle(const CLine& line, const CPoint& center, int radius, const CViewTransform& transform) {
-    const auto& pts = line.GetPoints();
-    if (pts.empty()) return false;
-
-    const double r2 = static_cast<double>(radius) * static_cast<double>(radius);
-    std::vector<CPoint> screenPts;
-    screenPts.reserve(pts.size());
-    for (const auto& p : pts) {
-        screenPts.push_back(transform.WorldToScreen(p));
-    }
-
-    for (const auto& p : screenPts) {
-        const double dx = static_cast<double>(p.x - center.x);
-        const double dy = static_cast<double>(p.y - center.y);
-        if (dx * dx + dy * dy <= r2) return true;
-    }
-
-    for (size_t i = 1; i < screenPts.size(); ++i) {
-        if (DistancePointToSegmentSquared(center, screenPts[i - 1], screenPts[i]) <= r2) {
-            return true;
-        }
-    }
-
-    return false;
-}
-}
+// 主对话框模块 / main dialog module
+// 下面函数在本文件被调用前的用法说明：
+// - `CreateCirclePolyline(center, radius, segments)`:
+//   center=圆心(world), radius=半径(world), segments=离散段数(>=8)
+// - `CreateRectanglePolyline(first, second)`:
+//   first/second=对角点(world), 返回闭合矩形折线
+// - `CreateArcPolylineByThreePoints(start, through, end, segments)`:
+//   start=起点, through=经过点, end=终点, segments=插值段数
+// - `RefreshCanvas()`:
+//   仅刷新绘图区，不重绘整个对话框
 
 BEGIN_MESSAGE_MAP(CCADDlg, CDialogEx)
     ON_WM_PAINT()
@@ -340,87 +222,6 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
     FocusCommandLine();
 }
 
-std::shared_ptr<CLine> CCADDlg::CreateCirclePolyline(const Point2D& center, double radius, int segments) const {
-    std::shared_ptr<CLine> circle = std::make_shared<CLine>();
-    if (segments < 8) segments = 8;
-    if (radius <= 0.0) return circle;
-
-    const double pi = 3.14159265358979323846;
-    for (int i = 0; i <= segments; ++i) {
-        double angle = (2.0 * pi * i) / static_cast<double>(segments);
-        circle->AddPoint(Point2D(center.x + radius * std::cos(angle), center.y + radius * std::sin(angle)));
-    }
-
-    return circle;
-}
-
-std::shared_ptr<CLine> CCADDlg::CreateRectanglePolyline(const Point2D& first, const Point2D& second) const {
-    std::shared_ptr<CLine> rect = std::make_shared<CLine>();
-    Point2D p1(first.x, first.y);
-    Point2D p2(second.x, first.y);
-    Point2D p3(second.x, second.y);
-    Point2D p4(first.x, second.y);
-
-    rect->AddPoint(p1);
-    rect->AddPoint(p2);
-    rect->AddPoint(p3);
-    rect->AddPoint(p4);
-    rect->AddPoint(p1);
-    return rect;
-}
-
-std::shared_ptr<CLine> CCADDlg::CreateArcPolylineByThreePoints(const Point2D& start, const Point2D& through, const Point2D& end, int segments) const {
-    std::shared_ptr<CLine> arc = std::make_shared<CLine>();
-
-    const double d = 2.0 * (start.x * (through.y - end.y) + through.x * (end.y - start.y) + end.x * (start.y - through.y));
-    if (std::fabs(d) < 1e-9) {
-        arc->AddPoint(start);
-        arc->AddPoint(through);
-        arc->AddPoint(end);
-        return arc;
-    }
-
-    const double s2 = start.x * start.x + start.y * start.y;
-    const double t2 = through.x * through.x + through.y * through.y;
-    const double e2 = end.x * end.x + end.y * end.y;
-
-    const double cx = (s2 * (through.y - end.y) + t2 * (end.y - start.y) + e2 * (start.y - through.y)) / d;
-    const double cy = (s2 * (end.x - through.x) + t2 * (start.x - end.x) + e2 * (through.x - start.x)) / d;
-    const Point2D center(cx, cy);
-
-    const double rdx = start.x - center.x;
-    const double rdy = start.y - center.y;
-    const double radius = std::sqrt(rdx * rdx + rdy * rdy);
-    if (radius < 1e-9) {
-        arc->AddPoint(start);
-        arc->AddPoint(end);
-        return arc;
-    }
-
-    double aStart = std::atan2(start.y - center.y, start.x - center.x);
-    double aThrough = std::atan2(through.y - center.y, through.x - center.x);
-    double aEnd = std::atan2(end.y - center.y, end.x - center.x);
-
-    double spanCCW = AngleDistanceCCW(aStart, aEnd);
-    double throughCCW = AngleDistanceCCW(aStart, aThrough);
-    bool ccw = throughCCW <= spanCCW;
-
-    if (segments < 8) segments = 8;
-    for (int i = 0; i <= segments; ++i) {
-        double t = static_cast<double>(i) / static_cast<double>(segments);
-        double angle;
-        if (ccw) {
-            angle = aStart + spanCCW * t;
-        } else {
-            double spanCW = 6.28318530717958647692 - spanCCW;
-            angle = aStart - spanCW * t;
-        }
-        arc->AddPoint(Point2D(center.x + radius * std::cos(angle), center.y + radius * std::sin(angle)));
-    }
-
-    return arc;
-}
-
 void CCADDlg::OnPaint() {
     CPaintDC dc(this);
 
@@ -514,7 +315,7 @@ void CCADDlg::OnPaint() {
     }
 
     if (m_currentMode == CADMode::MODE_SELECT && m_bIsSelectingBox) {
-        CRect box = NormalizeRect(m_selectBoxStart, m_selectBoxEnd);
+        CRect box = cad::dlg::NormalizeRect(m_selectBoxStart, m_selectBoxEnd);
         CPen dashPen(PS_DASH, 1, RGB(255, 255, 255));
         CPen* oldPen = memDC.SelectObject(&dashPen);
         int oldBkMode = memDC.SetBkMode(TRANSPARENT);
@@ -722,58 +523,6 @@ void CCADDlg::OnLButtonUp(UINT nFlags, CPoint point) {
 
     CDialogEx::OnLButtonUp(nFlags, point);
     FocusCommandLine();
-}
-
-void CCADDlg::ClearSelection() {
-    for (auto& shape : m_shapeMgr.GetShapes()) {
-        shape->SetSelected(false);
-    }
-}
-
-void CCADDlg::ApplySelectionBox() {
-    if (m_currentMode != CADMode::MODE_SELECT || m_bEraserCommandActive) return;
-
-    CRect box = NormalizeRect(m_selectBoxStart, m_selectBoxEnd);
-    if (box.Width() < 2 && box.Height() < 2) {
-        ClearSelection();
-        return;
-    }
-
-    ClearSelection();
-    for (auto& shape : m_shapeMgr.GetShapes()) {
-        if (PolylineIntersectsRect(*shape, box, m_transform)) {
-            shape->SetSelected(true);
-        }
-    }
-}
-
-void CCADDlg::DeleteSelectedLines() {
-    std::vector<std::shared_ptr<CLine>> selected;
-    for (const auto& shape : m_shapeMgr.GetShapes()) {
-        if (shape->IsSelected()) {
-            selected.push_back(shape);
-        }
-    }
-
-    if (selected.empty()) return;
-    m_shapeMgr.ExecuteCommand(std::make_unique<CDeleteLinesCommand>(&m_shapeMgr, std::move(selected)));
-    RefreshCanvas();
-}
-
-void CCADDlg::EraseAtPoint(const CPoint& localPt) {
-    if (!m_bEraserCommandActive) return;
-
-    std::vector<std::shared_ptr<CLine>> hits;
-    for (const auto& shape : m_shapeMgr.GetShapes()) {
-        if (PolylineIntersectsCircle(*shape, localPt, m_eraserRadius, m_transform)) {
-            hits.push_back(shape);
-        }
-    }
-
-    if (!hits.empty()) {
-        m_shapeMgr.ExecuteCommand(std::make_unique<CDeleteLinesCommand>(&m_shapeMgr, std::move(hits)));
-        RefreshCanvas();
-    }
 }
 
 void CCADDlg::FinishCurrentDrawing(bool keepCommandActive) {

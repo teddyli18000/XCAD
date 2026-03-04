@@ -1,6 +1,4 @@
-
-// CAD.cpp: ¶¨ÒåÓ¦ÓÃ³ÌÐòµÄÀàÐÐÎª¡£
-//
+// CAD app entry / 程序入口
 
 #include "pch.h"
 #include "framework.h"
@@ -12,26 +10,25 @@
 #endif
 
 
-// CCADApp
+// App message map / 消息映射
 
 BEGIN_MESSAGE_MAP(CCADApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CCADApp ¹¹Ôì
+// ctor / 构造
 
 CCADApp::CCADApp()
 {
-	// Ö§³ÖÖØÐÂÆô¶¯¹ÜÀíÆ÷
+	// restart support / 重启支持
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
 
-	// TODO: ÔÚ´Ë´¦Ìí¼Ó¹¹Ôì´úÂë£¬
-	// ½«ËùÓÐÖØÒªµÄ³õÊ¼»¯·ÅÖÃÔÚ InitInstance ÖÐ
+	// init in InitInstance / 初始化放到 InitInstance
 }
 
 
-// Î¨Ò»µÄ CCADApp ¶ÔÏó
+// global app / 全局应用对象
 
 CCADApp theApp;
 
@@ -55,42 +52,33 @@ BOOL CCADApp::InitInstance()
 
 	AfxEnableControlContainer();
 
-	// ´´½¨ shell ¹ÜÀíÆ÷£¬ÒÔ·À¶Ô»°¿ò°üº¬
-	// ÈÎºÎ shell Ê÷ÊÓÍ¼¿Ø¼þ»ò shell ÁÐ±íÊÓÍ¼¿Ø¼þ¡£
+	// shell manager / Shell 管理器
 	CShellManager *pShellManager = new CShellManager;
 
-	// ¼¤»î¡°Windows Native¡±ÊÓ¾õ¹ÜÀíÆ÷£¬ÒÔ±ãÔÚ MFC ¿Ø¼þÖÐÆôÓÃÖ÷Ìâ
+	// native visual manager / 原生主题
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
 
-	// ±ê×¼³õÊ¼»¯
-	// Èç¹ûÎ´Ê¹ÓÃÕâÐ©¹¦ÄÜ²¢Ï£Íû¼õÐ¡
-	// ×îÖÕ¿ÉÖ´ÐÐÎÄ¼þµÄ´óÐ¡£¬ÔòÓ¦ÒÆ³ýÏÂÁÐ
-	// ²»ÐèÒªµÄÌØ¶¨³õÊ¼»¯Àý³Ì
-	// ¸ü¸ÄÓÃÓÚ´æ´¢ÉèÖÃµÄ×¢²á±íÏî
-	// TODO: Ó¦ÊÊµ±ÐÞ¸Ä¸Ã×Ö·û´®£¬
-	// ÀýÈçÐÞ¸ÄÎª¹«Ë¾»ò×éÖ¯Ãû
-	SetRegistryKey(_T("Ó¦ÓÃ³ÌÐòÏòµ¼Éú³ÉµÄ±¾µØÓ¦ÓÃ³ÌÐò"));
+	// registry key / 注册表键
+	SetRegistryKey(_T("CAD Local App"));
 
 	CCADDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
-		// TODO: ÔÚ´Ë·ÅÖÃ´¦ÀíºÎÊ±ÓÃ
-		//  ¡°È·¶¨¡±À´¹Ø±Õ¶Ô»°¿òµÄ´úÂë
+		// ok closed / 确定关闭
 	}
 	else if (nResponse == IDCANCEL)
 	{
-		// TODO: ÔÚ´Ë·ÅÖÃ´¦ÀíºÎÊ±ÓÃ
-		//  ¡°È¡Ïû¡±À´¹Ø±Õ¶Ô»°¿òµÄ´úÂë
+		// cancel closed / 取消关闭
 	}
 	else if (nResponse == -1)
 	{
-		TRACE(traceAppMsg, 0, "¾¯¸æ: ¶Ô»°¿ò´´½¨Ê§°Ü£¬Ó¦ÓÃ³ÌÐò½«ÒâÍâÖÕÖ¹¡£\n");
-		TRACE(traceAppMsg, 0, "¾¯¸æ: Èç¹ûÄúÔÚ¶Ô»°¿òÉÏÊ¹ÓÃ MFC ¿Ø¼þ£¬ÔòÎÞ·¨ #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS¡£\n");
+		TRACE(traceAppMsg, 0, "Warning: dialog create failed.\n");
+		TRACE(traceAppMsg, 0, "Warning: check MFC controls in dialogs macro.\n");
 	}
 
-	// É¾³ýÉÏÃæ´´½¨µÄ shell ¹ÜÀíÆ÷¡£
+	// release shell manager / 释放管理器
 	if (pShellManager != nullptr)
 	{
 		delete pShellManager;
@@ -100,8 +88,7 @@ BOOL CCADApp::InitInstance()
 	ControlBarCleanUp();
 #endif
 
-	// ÓÉÓÚ¶Ô»°¿òÒÑ¹Ø±Õ£¬ËùÒÔ½«·µ»Ø FALSE ÒÔ±ãÍË³öÓ¦ÓÃ³ÌÐò£¬
-	//  ¶ø²»ÊÇÆô¶¯Ó¦ÓÃ³ÌÐòµÄÏûÏ¢±Ã¡£
+	// exit app after dialog / 对话框关闭后退出应用
 	return FALSE;
 }
 
