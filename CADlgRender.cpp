@@ -84,6 +84,7 @@ void CCADDlg::OnPaint() {
 
         CPen dashPen(PS_DASH, 1, RGB(200, 200, 200));
         CPen* oldPen = memDC.SelectObject(&dashPen);
+        CBrush* oldBrush = static_cast<CBrush*>(memDC.SelectStockObject(NULL_BRUSH));
         int oldBkMode = memDC.SetBkMode(TRANSPARENT);
 
         memDC.MoveTo(centerPt);
@@ -97,6 +98,7 @@ void CCADDlg::OnPaint() {
         }
 
         memDC.SetBkMode(oldBkMode);
+        memDC.SelectObject(oldBrush);
         memDC.SelectObject(oldPen);
     }
 
@@ -150,9 +152,11 @@ void CCADDlg::OnPaint() {
         CRect box = cad::dlg::NormalizeRect(m_selectBoxStart, m_selectBoxEnd);
         CPen dashPen(PS_DASH, 1, RGB(255, 255, 255));
         CPen* oldPen = memDC.SelectObject(&dashPen);
+        CBrush* oldBrush = static_cast<CBrush*>(memDC.SelectStockObject(NULL_BRUSH));
         int oldBkMode = memDC.SetBkMode(TRANSPARENT);
         memDC.Rectangle(&box);
         memDC.SetBkMode(oldBkMode);
+        memDC.SelectObject(oldBrush);
         memDC.SelectObject(oldPen);
     }
 
