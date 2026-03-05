@@ -11,6 +11,8 @@ private:
     std::vector<Point2D> m_points;
     bool m_bSelected;
     COLORREF m_color;
+    bool m_hasFill;
+    COLORREF m_fillColor;
 
 public:
     CLine();
@@ -20,6 +22,9 @@ public:
     bool IsSelected() const;
     void SetColor(COLORREF color);
     COLORREF GetColor() const;
+    void SetFill(bool hasFill, COLORREF fillColor);
+    bool HasFill() const;
+    COLORREF GetFillColor() const;
 
     const std::vector<Point2D>& GetPoints() const;
 

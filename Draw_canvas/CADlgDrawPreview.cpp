@@ -84,4 +84,6 @@ void CCADDlg::DrawPreview(CDC* pDC) {
         pDC->SetBkMode(oldBkMode);
         pDC->SelectObject(oldPen);
     }
+
+    DrawHatchPreview(pDC);
 }

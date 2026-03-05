@@ -140,6 +140,12 @@
     <ClCompile Include="Draw_tools\ArcTool.cpp">
       <Filter>Draw_tools</Filter>
     </ClCompile>
+    <ClCompile Include="Draw_canvas\CADlgDrawHatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CADDLG.CPP">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CAD.rc">

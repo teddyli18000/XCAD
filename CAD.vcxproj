@@ -203,12 +203,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CAD.cpp" />
+    <ClCompile Include="CADDLG.CPP" />
     <ClCompile Include="CADlg.cpp" />
     <ClCompile Include="CADlgGeometryUtils.cpp" />
     <ClCompile Include="CADlgSelection.cpp" />
     <ClCompile Include="CADlgShapeFactory.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Draw_canvas\CADlgDrawCursor.cpp" />
+    <ClCompile Include="Draw_canvas\CADlgDrawHatch.cpp" />
     <ClCompile Include="Draw_canvas\CADlgDrawModel.cpp" />
     <ClCompile Include="Draw_canvas\CADlgDrawPreview.cpp" />
     <ClCompile Include="Draw_canvas\CADlgDrawSelection.cpp" />

@@ -20,6 +20,7 @@ enum class CADCommandType {
     CIRCLE,
     RECTANGLE,
     ARC,
+    HATCH,
     ERASER,
     DELETE_NODE
 };
@@ -51,8 +52,10 @@ protected:
     bool m_bRectangleCommandActive;
     bool m_bRectangleFirstPicked;
     bool m_bArcCommandActive;
+    bool m_bHatchCommandActive;
     bool m_bEraserCommandActive;
     bool m_bDeleteNodeCommandActive;
+    bool m_bHatchPreviewVisible;
     bool m_bIsSelectingBox;
     bool m_bIsErasing;
     bool m_bEraserCursorVisible;
@@ -62,6 +65,7 @@ protected:
     CPoint m_selectBoxStart;
     CPoint m_selectBoxEnd;
     CPoint m_eraserCursor;
+    CPoint m_hatchPreviewPoint;
     Point2D m_circleCenter;
     Point2D m_circlePreviewPoint;
     Point2D m_rectFirstPoint;
@@ -69,6 +73,7 @@ protected:
     Point2D m_arcStartPoint;
     Point2D m_arcSecondPoint;
     Point2D m_arcPreviewPoint;
+    COLORREF m_hatchColor;
 
     std::shared_ptr<CLine> m_pCurrentLine;
     std::vector<std::unique_ptr<CBitmap>> m_colorButtonBitmaps;
@@ -93,6 +98,7 @@ protected:
 	afx_msg void OnBnClickedCircle();
 	afx_msg void OnBnClickedRectangle();
 	afx_msg void OnBnClickedArc();
+	afx_msg void OnBnClickedHatch();
 	afx_msg void OnBnClickedSel();
 	afx_msg void OnBnClickedViewPoint();
 	afx_msg void OnBnClickedHidePoint();
@@ -139,6 +145,7 @@ protected:
 	void EraseAtPoint(const CPoint& localPt);
 	void DrawModel(CDC* pDC);
 	void DrawPreview(CDC* pDC);
+	void DrawHatchPreview(CDC* pDC);
 	void DrawSelection(CDC* pDC);
 	void DrawCursor(CDC* pDC);
 	bool HandleLineToolLButtonDown(const Point2D& worldPt);
@@ -149,6 +156,8 @@ protected:
 	bool HandleRectToolMouseMove(const Point2D& worldPt);
 	bool HandleArcToolLButtonDown(const Point2D& worldPt);
 	bool HandleArcToolMouseMove(const Point2D& worldPt);
+	bool HandleHatchToolLButtonDown(const CPoint& localPt);
+	bool HandleHatchToolMouseMove(const CPoint& localPt, bool inCanvas);
 	bool HandleSelectionToolLButtonDown(const CPoint& localPt);
 	bool HandleSelectionToolMouseMove(const CPoint& localPt);
 	bool HandleSelectionToolLButtonUp(const CPoint& localPt);
@@ -158,4 +167,6 @@ protected:
 	void UpdateModeButtonHighlight();
 
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnStnClickedDrawArea();
 };

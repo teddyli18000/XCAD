@@ -26,6 +26,22 @@ public:
     void Undo() override;
 };
 
+class CChangeLineFillCommand : public ICadCommand {
+private:
+    CShapeManager* m_pManager;
+    std::shared_ptr<CLine> m_line;
+    bool m_oldHasFill;
+    COLORREF m_oldFillColor;
+    bool m_newHasFill;
+    COLORREF m_newFillColor;
+
+public:
+    CChangeLineFillCommand(CShapeManager* mgr, std::shared_ptr<CLine> line, bool newHasFill, COLORREF newFillColor);
+
+    void Execute() override;
+    void Undo() override;
+};
+
 class CChangeLineColorCommand : public ICadCommand {
 private:
     CShapeManager* m_pManager;

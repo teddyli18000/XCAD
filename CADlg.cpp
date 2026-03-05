@@ -39,6 +39,7 @@ BEGIN_MESSAGE_MAP(CCADDlg, CDialogEx)
     ON_BN_CLICKED(IDC_DRAW_CIRCLE, &CCADDlg::OnBnClickedCircle)
     ON_BN_CLICKED(IDC_DRAW_RECT, &CCADDlg::OnBnClickedRectangle)
     ON_BN_CLICKED(IDC_DRAW_ARC, &CCADDlg::OnBnClickedArc)
+    ON_BN_CLICKED(IDC_HATCH, &CCADDlg::OnBnClickedHatch)
     ON_BN_CLICKED(IDC_SEL, &CCADDlg::OnBnClickedSel)
     ON_BN_CLICKED(IDC_VIEW_POINT, &CCADDlg::OnBnClickedViewPoint)
     ON_BN_CLICKED(IDC_HIDE_POINT, &CCADDlg::OnBnClickedHidePoint)
@@ -65,6 +66,7 @@ BEGIN_MESSAGE_MAP(CCADDlg, CDialogEx)
     ON_BN_CLICKED(IDC_COLOR_BLUE, &CCADDlg::OnBnClickedColorBlue)
     ON_BN_CLICKED(IDC_COLOR_MAGENTA, &CCADDlg::OnBnClickedColorMagenta)
     ON_BN_CLICKED(IDC_ABOUT_ICON, &CCADDlg::OnBnClickedAboutIcon)
+    ON_STN_CLICKED(IDC_DRAW_AREA, &CCADDlg::OnStnClickedDrawArea)
 END_MESSAGE_MAP()
 
 CCADDlg::CCADDlg(CWnd* pParent)
@@ -79,8 +81,10 @@ CCADDlg::CCADDlg(CWnd* pParent)
     , m_bRectangleCommandActive(false)
     , m_bRectangleFirstPicked(false)
     , m_bArcCommandActive(false)
+    , m_bHatchCommandActive(false)
     , m_bEraserCommandActive(false)
     , m_bDeleteNodeCommandActive(false)
+    , m_bHatchPreviewVisible(false)
     , m_bIsSelectingBox(false)
     , m_bIsErasing(false)
     , m_bEraserCursorVisible(false)
@@ -89,13 +93,15 @@ CCADDlg::CCADDlg(CWnd* pParent)
     , m_selectBoxStart(0, 0)
     , m_selectBoxEnd(0, 0)
     , m_eraserCursor(0, 0)
+    , m_hatchPreviewPoint(0, 0)
     , m_circleCenter(0.0, 0.0)
     , m_circlePreviewPoint(0.0, 0.0)
     , m_rectFirstPoint(0.0, 0.0)
     , m_rectPreviewPoint(0.0, 0.0)
     , m_arcStartPoint(0.0, 0.0)
     , m_arcSecondPoint(0.0, 0.0)
-    , m_arcPreviewPoint(0.0, 0.0) {
+    , m_arcPreviewPoint(0.0, 0.0)
+    , m_hatchColor(RGB(255, 255, 255)) {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
@@ -176,16 +182,18 @@ void CCADDlg::UpdateModeButtonHighlight() {
     const bool circleActive = (m_currentMode == CADMode::MODE_DRAW && m_bCircleCommandActive);
     const bool rectActive = (m_currentMode == CADMode::MODE_DRAW && m_bRectangleCommandActive);
     const bool arcActive = (m_currentMode == CADMode::MODE_DRAW && m_bArcCommandActive);
-    const bool drawModeActive = lineActive || circleActive || rectActive || arcActive;
+    const bool hatchActive = (m_currentMode == CADMode::MODE_SELECT && m_bHatchCommandActive);
+    const bool drawModeActive = lineActive || circleActive || rectActive || arcActive || hatchActive;
     const bool eraseActive = (m_currentMode == CADMode::MODE_SELECT && m_bEraserCommandActive);
     const bool deleteNodeActive = (m_currentMode == CADMode::MODE_SELECT && m_bDeleteNodeCommandActive);
-    const bool selectModeActive = (m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteNodeCommandActive);
+    const bool selectModeActive = (m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteNodeCommandActive && !m_bHatchCommandActive);
 
     setPushed(IDC_DRAW, drawModeActive);
     setPushed(IDC_DRAW_LINE, lineActive);
     setPushed(IDC_DRAW_CIRCLE, circleActive);
     setPushed(IDC_DRAW_RECT, rectActive);
     setPushed(IDC_DRAW_ARC, arcActive);
+    setPushed(IDC_HATCH, hatchActive);
     setPushed(IDC_DEL_POINT, deleteNodeActive);
     setPushed(IDC_SEL, selectModeActive);
     setPushed(IDC_DEL_LINE, eraseActive);
@@ -226,8 +234,10 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
     m_bRectangleCommandActive = false;
     m_bRectangleFirstPicked = false;
     m_bArcCommandActive = false;
+    m_bHatchCommandActive = false;
     m_bEraserCommandActive = false;
     m_bDeleteNodeCommandActive = false;
+    m_bHatchPreviewVisible = false;
     m_bIsSelectingBox = false;
     m_bIsErasing = false;
     m_bEraserCursorVisible = false;
@@ -247,6 +257,9 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
     } else if (commandType == CADCommandType::ARC) {
         m_currentMode = CADMode::MODE_DRAW;
         m_bArcCommandActive = true;
+    } else if (commandType == CADCommandType::HATCH) {
+        m_currentMode = CADMode::MODE_SELECT;
+        m_bHatchCommandActive = true;
     } else if (commandType == CADCommandType::ERASER) {
         m_currentMode = CADMode::MODE_SELECT;
         m_bEraserCommandActive = true;
@@ -295,6 +308,10 @@ void CCADDlg::OnBnClickedRectangle() {
 
 void CCADDlg::OnBnClickedArc() {
     ActivateCommand(CADCommandType::ARC);
+}
+
+void CCADDlg::OnBnClickedHatch() {
+    ActivateCommand(CADCommandType::HATCH);
 }
 
 void CCADDlg::OnBnClickedSel() {
@@ -440,6 +457,13 @@ void CCADDlg::OnBnClickedDelPoint() {
 }
 
 void CCADDlg::ApplyColorToSelectedLines(COLORREF color) {
+    if (m_bHatchCommandActive) {
+        m_hatchColor = color;
+        RefreshCanvas();
+        FocusCommandLine();
+        return;
+    }
+
     std::vector<std::shared_ptr<CLine>> selected;
     for (const auto& shape : m_shapeMgr.GetShapes()) {
         if (shape->IsSelected()) {

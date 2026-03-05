@@ -31,11 +31,15 @@ void CCADDlg::OnLButtonDown(UINT nFlags, CPoint point) {
             handled = HandleArcToolLButtonDown(worldPt);
         }
     } else if (m_currentMode == CADMode::MODE_SELECT) {
-        ClearSelection();
-        if (m_bEraserCommandActive || m_bDeleteNodeCommandActive) {
-            handled = HandleEraserToolLButtonDown(localPt);
+        if (m_bHatchCommandActive) {
+            handled = HandleHatchToolLButtonDown(localPt);
         } else {
-            handled = HandleSelectionToolLButtonDown(localPt);
+            ClearSelection();
+            if (m_bEraserCommandActive || m_bDeleteNodeCommandActive) {
+                handled = HandleEraserToolLButtonDown(localPt);
+            } else {
+                handled = HandleSelectionToolLButtonDown(localPt);
+            }
         }
     }
 
@@ -63,6 +67,7 @@ void CCADDlg::OnMouseMove(UINT nFlags, CPoint point) {
         || HandleCircleToolMouseMove(worldPt)
         || HandleRectToolMouseMove(worldPt)
         || HandleArcToolMouseMove(worldPt)
+        || HandleHatchToolMouseMove(localPt, inCanvas)
         || HandleEraserToolMouseMove(nFlags, localPt, inCanvas)
         || HandleSelectionToolMouseMove(localPt)) {
         RefreshCanvas();
@@ -155,8 +160,10 @@ void CCADDlg::CancelCurrentDrawing() {
     m_bRectangleCommandActive = false;
     m_bRectangleFirstPicked = false;
     m_bArcCommandActive = false;
+    m_bHatchCommandActive = false;
     m_bEraserCommandActive = false;
     m_bDeleteNodeCommandActive = false;
+    m_bHatchPreviewVisible = false;
     m_bIsSelectingBox = false;
     m_bIsErasing = false;
     m_bEraserCursorVisible = false;
@@ -188,8 +195,10 @@ void CCADDlg::CancelActiveCommand() {
     m_bRectangleCommandActive = false;
     m_bRectangleFirstPicked = false;
     m_bArcCommandActive = false;
+    m_bHatchCommandActive = false;
     m_bEraserCommandActive = false;
     m_bDeleteNodeCommandActive = false;
+    m_bHatchPreviewVisible = false;
     m_bIsSelectingBox = false;
     m_bIsErasing = false;
     m_bEraserCursorVisible = false;

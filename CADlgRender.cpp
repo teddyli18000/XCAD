@@ -127,3 +127,4 @@ void CCADDlg::OnSize(UINT nType, int cx, int cy) {
         RefreshCanvas();
     }
 }
+

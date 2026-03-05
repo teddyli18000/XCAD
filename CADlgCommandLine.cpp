@@ -24,6 +24,8 @@ void CCADDlg::ProcessCommandLine(const CString& cmd) {
         ActivateCommand(CADCommandType::RECTANGLE);
     } else if (normalized == _T("A") || normalized == _T("ARC")) {
         ActivateCommand(CADCommandType::ARC);
+    } else if (normalized == _T("H") || normalized == _T("HATCH")) {
+        ActivateCommand(CADCommandType::HATCH);
     } else if (normalized == _T("E") || normalized == _T("ER") || normalized == _T("ERASE")) {
         ActivateCommand(CADCommandType::ERASER);
     } else if (normalized == _T("ESC") || normalized == _T("CANCEL")) {
@@ -93,7 +95,7 @@ BOOL CCADDlg::PreTranslateMessage(MSG* pMsg) {
         }
 
         if ((pMsg->wParam == VK_DELETE || pMsg->wParam == VK_BACK) &&
-            m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteNodeCommandActive) {
+            m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteNodeCommandActive && !m_bHatchCommandActive) {
             DeleteSelectedLines();
             FocusCommandLine();
             return TRUE;

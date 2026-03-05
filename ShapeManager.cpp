@@ -107,7 +107,8 @@ bool CShapeManager::SaveToDXF(const std::wstring& filepath) const {
         const auto& pts = shape->GetPoints();
         if (pts.size() < 2) continue;
 
-        fprintf(fp, "  0\nPOLYLINE\n  8\n0\n 62\n%d\n 66\n1\n", ColorToDxfAci(shape->GetColor()));
+        fprintf(fp, "  0\nPOLYLINE\n  8\n0\n 62\n%d\n 450\n%d\n 451\n%d\n 66\n1\n",
+            ColorToDxfAci(shape->GetColor()), shape->HasFill() ? 1 : 0, ColorToDxfAci(shape->GetFillColor()));
         for (const auto& pt : pts) {
             fprintf(fp, "  0\nVERTEX\n  8\n0\n 10\n%f\n 20\n%f\n 30\n0.0\n", pt.x, pt.y);
         }
@@ -140,6 +141,7 @@ bool CShapeManager::LoadFromDXF(const std::wstring& filepath) {
         if (code == 0 && value == "POLYLINE") {
             currentLine = std::make_shared<CLine>();
             currentLine->SetColor(RGB(255, 255, 255));
+            currentLine->SetFill(false, RGB(255, 255, 255));
             hasPendingX = false;
             continue;
         }
@@ -164,7 +166,16 @@ bool CShapeManager::LoadFromDXF(const std::wstring& filepath) {
             hasPendingX = false;
         } else if (code == 62) {
             currentLine->SetColor(DxfAciToColor(std::atoi(value.c_str())));
+        } else if (code == 450) {
+            const bool hasFill = std::atoi(value.c_str()) != 0;
+            currentLine->SetFill(hasFill, currentLine->GetFillColor());
+        } else if (code == 451) {
+            currentLine->SetFill(currentLine->HasFill(), DxfAciToColor(std::atoi(value.c_str())));
         }
+    }
+
+    if (currentLine && currentLine->GetPoints().size() >= 2) {
+        m_shapes.push_back(currentLine);
     }
 
     fclose(fp);

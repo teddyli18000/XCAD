@@ -109,7 +109,7 @@ void CCADDlg::ClearSelection() {
 }
 
 void CCADDlg::ApplySelectionBox() {
-    if (m_currentMode != CADMode::MODE_SELECT || m_bEraserCommandActive || m_bDeleteNodeCommandActive) return;
+    if (m_currentMode != CADMode::MODE_SELECT || m_bEraserCommandActive || m_bDeleteNodeCommandActive || m_bHatchCommandActive) return;
 
     const CRect box = cad::dlg::NormalizeRect(m_selectBoxStart, m_selectBoxEnd);
     if (box.Width() < 2 && box.Height() < 2) {

@@ -8,8 +8,11 @@ void CViewTransform::SetScreenRect(const CRect& rect) { m_screenRect = rect; }
 CRect CViewTransform::GetScreenRect() const { return m_screenRect; }
 
 void CViewTransform::Zoom(double factor, const CPoint& screenCenter) {
+    if (factor <= 0.0) return;
+
     Point2D worldCenter = ScreenToWorld(screenCenter);
     m_scale *= factor;
+    if (m_scale < 1e-9) m_scale = 1e-9;
     Point2D newWorldCenter = ScreenToWorld(screenCenter);
     m_offsetX += (newWorldCenter.x - worldCenter.x);
     m_offsetY += (newWorldCenter.y - worldCenter.y);

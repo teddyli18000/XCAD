@@ -69,3 +69,29 @@ void CChangeLineColorCommand::Undo() {
         }
     }
 }
+
+CChangeLineFillCommand::CChangeLineFillCommand(CShapeManager* mgr, std::shared_ptr<CLine> line, bool newHasFill, COLORREF newFillColor)
+    : m_pManager(mgr),
+    m_line(std::move(line)),
+    m_oldHasFill(false),
+    m_oldFillColor(RGB(255, 255, 255)),
+    m_newHasFill(newHasFill),
+    m_newFillColor(newFillColor) {
+    if (m_line) {
+        m_oldHasFill = m_line->HasFill();
+        m_oldFillColor = m_line->GetFillColor();
+    }
+}
+
+void CChangeLineFillCommand::Execute() {
+    UNREFERENCED_PARAMETER(m_pManager);
+    if (m_line) {
+        m_line->SetFill(m_newHasFill, m_newFillColor);
+    }
+}
+
+void CChangeLineFillCommand::Undo() {
+    if (m_line) {
+        m_line->SetFill(m_oldHasFill, m_oldFillColor);
+    }
+}
