@@ -27,8 +27,15 @@ const int kDxfAciMagenta = 6;
 const int kDxfAciWhite = 7;
 
 const int kDxfMinPolylinePoints = 2;
+const char* kDxfMetaAppName = "CAD_ENTITY_META";
+const char* kDxfMetaKeyEntityType = "ET";
+const char* kDxfMetaKeyCenterX = "CX";
+const char* kDxfMetaKeyCenterY = "CY";
+const char* kDxfMetaKeyRadius = "R";
+const char* kDxfMetaKeyStartAngle = "SA";
+const char* kDxfMetaKeyEndAngle = "EA";
 
-// 功能：去除文本两端空白，便于解析 DXF 行内容。
+//去除文本两端空白，便于解析 DXF 行内容
 std::string Trim(const std::string& text) {
     std::string s = text;
     while (!s.empty() && (s.back() == '\n' || s.back() == '\r' || std::isspace(static_cast<unsigned char>(s.back())))) {
@@ -41,7 +48,7 @@ std::string Trim(const std::string& text) {
     return s.substr(start);
 }
 
-// 功能：把 RGB 颜色映射为 DXF ACI 颜色索引。
+//把 RGB 颜色映射为 DXF ACI 颜色索引
 int ColorToDxfAci(COLORREF color) {
     if (color == kCadColorRed) return kDxfAciRed;
     if (color == kCadColorYellow) return kDxfAciYellow;
@@ -52,7 +59,7 @@ int ColorToDxfAci(COLORREF color) {
     return kDxfAciWhite;
 }
 
-// 功能：把 DXF ACI 颜色索引映射回 RGB。
+//把 DXF ACI 颜色索引映射回 RGB
 COLORREF DxfAciToColor(int aci) {
     switch (aci) {
     case kDxfAciRed: return kCadColorRed;
@@ -65,6 +72,47 @@ COLORREF DxfAciToColor(int aci) {
     default:
         return kCadColorWhite;
     }
+}
+
+//text to int, for DXF metadata storage
+int EntityTypeToInt(EntityType type) {
+    switch (type) {
+    case EntityType::LINE: return 0;
+    case EntityType::CIRCLE: return 1;
+    case EntityType::ARC: return 2;
+    case EntityType::RECTANGLE: return 3;
+    default: return 0;
+    }
+}
+
+//int to text, for DXF metadata parsing
+EntityType IntToEntityType(int value) {
+    switch (value) {
+    case 1: return EntityType::CIRCLE;
+    case 2: return EntityType::ARC;
+    case 3: return EntityType::RECTANGLE;
+    case 0:
+    default:
+        return EntityType::LINE;
+    }
+}
+
+void AppendEntityMetadata(std::ostringstream& dxf, const CLine& shape) {
+    const EntityData& data = shape.GetEntityData();
+    dxf << "1001\n" << kDxfMetaAppName
+        << "\n1000\n" << kDxfMetaKeyEntityType
+        << "\n1070\n" << EntityTypeToInt(shape.GetEntityType())
+        << "\n1000\n" << kDxfMetaKeyCenterX
+        << "\n1040\n" << data.Center.x
+        << "\n1000\n" << kDxfMetaKeyCenterY
+        << "\n1040\n" << data.Center.y
+        << "\n1000\n" << kDxfMetaKeyRadius
+        << "\n1040\n" << data.Radius
+        << "\n1000\n" << kDxfMetaKeyStartAngle
+        << "\n1040\n" << data.StartAngle
+        << "\n1000\n" << kDxfMetaKeyEndAngle
+        << "\n1040\n" << data.EndAngle
+        << "\n";
 }
 
 std::string WideToUtf8(const std::wstring& text) {
@@ -86,18 +134,18 @@ std::wstring Utf8ToWide(const std::string& text) {
 }
 }
 
-// 功能：向图元列表添加一个图形对象。
+//向图元列表添加一个图形对象
 void CShapeManager::AddShape(std::shared_ptr<CLine> shape) {
     m_shapes.push_back(std::move(shape));
 }
 
-// 功能：从图元列表移除指定图形对象。
+//从图元列表移除指定图形对象
 void CShapeManager::RemoveShape(std::shared_ptr<CLine> shape) {
     auto it = std::find(m_shapes.begin(), m_shapes.end(), shape);
     if (it != m_shapes.end()) m_shapes.erase(it);
 }
 
-// 功能：清空图形与撤销重做栈。
+//清空图形与撤销重做栈
 void CShapeManager::Clear() {
     m_shapes.clear();
     while (!m_undoStack.empty()) m_undoStack.pop();
@@ -106,24 +154,24 @@ void CShapeManager::Clear() {
     m_savedHistoryIndex = 0;
 }
 
-// 功能：返回可写的图形容器引用。
+//返回可写的图形容器引用
 std::vector<std::shared_ptr<CLine>>& CShapeManager::GetShapes() {
     return m_shapes;
 }
 
-// 功能：返回只读的图形容器引用。
+//返回只读的图形容器引用
 const std::vector<std::shared_ptr<CLine>>& CShapeManager::GetShapes() const {
     return m_shapes;
 }
 
-// 功能：绘制所有图元。
+//绘制所有图元
 void CShapeManager::DrawAll(CDC* pDC, const CViewTransform& transform, bool bShowPoints) const {
     for (const auto& shape : m_shapes) {
         shape->Draw(pDC, transform, bShowPoints);
     }
 }
 
-// 功能：执行命令并压入撤销栈。
+//执行命令并压入撤销栈
 void CShapeManager::ExecuteCommand(std::unique_ptr<ICadCommand> cmd) {
     cmd->Execute();
     m_undoStack.push(std::move(cmd));
@@ -131,7 +179,7 @@ void CShapeManager::ExecuteCommand(std::unique_ptr<ICadCommand> cmd) {
     ++m_historyIndex;
 }
 
-// 功能：执行撤销操作。
+//执行撤销操作
 void CShapeManager::Undo() {
     if (!m_undoStack.empty()) {
         std::unique_ptr<ICadCommand> cmd = std::move(m_undoStack.top());
@@ -142,7 +190,7 @@ void CShapeManager::Undo() {
     }
 }
 
-// 功能：执行重做操作。
+//执行重做操作
 void CShapeManager::Redo() {
     if (!m_redoStack.empty()) {
         std::unique_ptr<ICadCommand> cmd = std::move(m_redoStack.top());
@@ -153,17 +201,17 @@ void CShapeManager::Redo() {
     }
 }
 
-// 功能：将当前编辑状态标记为已保存。
+//将当前编辑状态标记为已保存
 void CShapeManager::MarkSaved() {
     m_savedHistoryIndex = m_historyIndex;
 }
 
-// 功能：判断当前是否有未保存修改。
+//判断当前是否有未保存修改
 bool CShapeManager::HasUnsavedChanges() const {
     return m_historyIndex != m_savedHistoryIndex;
 }
 
-// 功能：将当前图元导出为 DXF 文件。
+//将当前图元导出为 DXF 文件
 bool CShapeManager::SaveToDXF(const std::wstring& filepath) const {
     std::ostringstream dxf;
     dxf << "  0\nSECTION\n  2\nENTITIES\n";
@@ -185,6 +233,7 @@ bool CShapeManager::SaveToDXF(const std::wstring& filepath) const {
                 << "\n 40\n" << textHeight
                 << "\n  1\n" << WideToUtf8(shape->GetTextContent())
                 << "\n";
+            AppendEntityMetadata(dxf, *shape);
             continue;
         }
 
@@ -197,6 +246,7 @@ bool CShapeManager::SaveToDXF(const std::wstring& filepath) const {
         for (const auto& pt : pts) {
             dxf << "  0\nVERTEX\n  8\n0\n 10\n" << pt.x << "\n 20\n" << pt.y << "\n 30\n0.0\n";
         }
+        AppendEntityMetadata(dxf, *shape);
         dxf << "  0\nSEQEND\n";
     }
 
@@ -214,7 +264,7 @@ bool CShapeManager::SaveToDXF(const std::wstring& filepath) const {
     return true;
 }
 
-// 功能：从 DXF 文件加载图元数据。
+//从 DXF 文件加载图元数据
 bool CShapeManager::LoadFromDXF(const std::wstring& filepath) {
     FILE* inFile = nullptr;
     _wfopen_s(&inFile, filepath.c_str(), L"rb");
@@ -247,9 +297,22 @@ bool CShapeManager::LoadFromDXF(const std::wstring& filepath) {
     double textY1 = 0.0;
     double textX2 = 0.0;
     double textY2 = 0.0;
+    EntityData pendingEntityData;
+    bool hasPendingEntityData = false;
+    bool hasPendingEntityType = false;
+    EntityType pendingEntityType = EntityType::LINE;
+    bool readingMetaData = false;
+    std::string lastMetaKey;
 
     auto finalizeCurrentShape = [&]() {
         if (!currentLine) return;
+
+        if (hasPendingEntityType) {
+            currentLine->SetEntityType(pendingEntityType);
+        }
+        if (hasPendingEntityData) {
+            currentLine->SetEntityData(pendingEntityData);
+        }
 
         if (currentLine->IsTextEntity()) {
             if (textHasX1 && textHasY1 && textHasX2 && textHasY2) {
@@ -270,6 +333,12 @@ bool CShapeManager::LoadFromDXF(const std::wstring& filepath) {
         textHasY1 = false;
         textHasX2 = false;
         textHasY2 = false;
+        pendingEntityData = EntityData();
+        hasPendingEntityData = false;
+        hasPendingEntityType = false;
+        pendingEntityType = EntityType::LINE;
+        readingMetaData = false;
+        lastMetaKey.clear();
     };
 
     std::vector<std::string> lines;
@@ -291,6 +360,11 @@ bool CShapeManager::LoadFromDXF(const std::wstring& filepath) {
             currentLine->SetColor(kCadColorWhite);
             currentLine->SetFill(false, kCadColorWhite);
             hasPendingX = false;
+            pendingEntityData = EntityData();
+            hasPendingEntityData = false;
+            hasPendingEntityType = false;
+            readingMetaData = false;
+            lastMetaKey.clear();
             continue;
         }
 
@@ -299,6 +373,11 @@ bool CShapeManager::LoadFromDXF(const std::wstring& filepath) {
             currentLine = std::make_shared<CLine>();
             currentLine->SetTextEntity(true);
             currentLine->SetColor(kCadColorWhite);
+            pendingEntityData = EntityData();
+            hasPendingEntityData = false;
+            hasPendingEntityType = false;
+            readingMetaData = false;
+            lastMetaKey.clear();
             continue;
         }
 
@@ -317,6 +396,53 @@ bool CShapeManager::LoadFromDXF(const std::wstring& filepath) {
         }
 
         if (!currentLine) continue;
+
+        if (code == 1001) {
+            readingMetaData = (value == kDxfMetaAppName);
+            lastMetaKey.clear();
+            continue;
+        }
+
+        if (readingMetaData) {
+            if (code == 1000) {
+                lastMetaKey = value;
+                continue;
+            }
+
+            if (lastMetaKey == kDxfMetaKeyEntityType && code == 1070) {
+                pendingEntityType = IntToEntityType(std::atoi(value.c_str()));
+                hasPendingEntityType = true;
+                continue;
+            }
+
+            if (code == 1040) {
+                if (lastMetaKey == kDxfMetaKeyCenterX) {
+                    pendingEntityData.Center.x = std::atof(value.c_str());
+                    hasPendingEntityData = true;
+                    continue;
+                }
+                if (lastMetaKey == kDxfMetaKeyCenterY) {
+                    pendingEntityData.Center.y = std::atof(value.c_str());
+                    hasPendingEntityData = true;
+                    continue;
+                }
+                if (lastMetaKey == kDxfMetaKeyRadius) {
+                    pendingEntityData.Radius = std::atof(value.c_str());
+                    hasPendingEntityData = true;
+                    continue;
+                }
+                if (lastMetaKey == kDxfMetaKeyStartAngle) {
+                    pendingEntityData.StartAngle = std::atof(value.c_str());
+                    hasPendingEntityData = true;
+                    continue;
+                }
+                if (lastMetaKey == kDxfMetaKeyEndAngle) {
+                    pendingEntityData.EndAngle = std::atof(value.c_str());
+                    hasPendingEntityData = true;
+                    continue;
+                }
+            }
+        }
 
         if (currentLine->IsTextEntity()) {
             if (code == 10) {
