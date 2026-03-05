@@ -30,6 +30,22 @@ public:
     void Undo() override;
 };
 
+// 平移线条命令 / move lines command
+class CMoveLinesCommand : public ICadCommand {
+private:
+    CShapeManager* m_pManager;
+    std::vector<std::shared_ptr<CLine>> m_lines;
+    double m_dx;
+    double m_dy;
+    bool m_hasExecuted;
+
+public:
+    CMoveLinesCommand(CShapeManager* mgr, std::vector<std::shared_ptr<CLine>> lines, double dx, double dy, bool alreadyApplied = false);
+
+    void Execute() override;
+    void Undo() override;
+};
+
 // 修改填充命令 / change fill command
 class CChangeLineFillCommand : public ICadCommand {
 private:

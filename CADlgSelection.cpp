@@ -127,6 +127,16 @@ void CCADDlg::ClearSelection() {
     }
 }
 
+// 功能：判断当前是否存在已选中的线条。
+bool CCADDlg::HasSelectedLines() const {
+    for (const auto& shape : m_shapeMgr.GetShapes()) {
+        if (shape && shape->IsSelected()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // 功能：根据框选矩形更新选中图元。
 void CCADDlg::ApplySelectionBox() {
     if (m_currentMode != CADMode::MODE_SELECT || m_bEraserCommandActive || m_bDeleteNodeCommandActive || m_bHatchCommandActive) return;

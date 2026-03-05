@@ -19,6 +19,7 @@ enum class CADCommandType {
     LINE,
     CIRCLE,
     RECTANGLE,
+    TEXT,
     ARC,
     HATCH,
     ERASER,
@@ -52,12 +53,16 @@ protected:
     bool m_bCircleCenterPicked;
     bool m_bRectangleCommandActive;
     bool m_bRectangleFirstPicked;
+    bool m_bTextCommandActive;
+    bool m_bTextFirstPicked;
+    bool m_bTextInputActive;
     bool m_bArcCommandActive;
     bool m_bHatchCommandActive;
     bool m_bEraserCommandActive;
     bool m_bDeleteNodeCommandActive;
     bool m_bHatchPreviewVisible;
     bool m_bIsSelectingBox;
+    bool m_bIsMovingSelection;
     bool m_bIsErasing;
     bool m_bEraserCursorVisible;
     int m_arcPointCount;
@@ -65,19 +70,27 @@ protected:
     CPoint m_lastMousePt;
     CPoint m_selectBoxStart;
     CPoint m_selectBoxEnd;
+    CPoint m_selectionMoveLastPt;
     CPoint m_eraserCursor;
     CPoint m_hatchPreviewPoint;
     Point2D m_circleCenter;
     Point2D m_circlePreviewPoint;
     Point2D m_rectFirstPoint;
     Point2D m_rectPreviewPoint;
+    Point2D m_textFirstPoint;
+    Point2D m_textPreviewPoint;
     Point2D m_arcStartPoint;
     Point2D m_arcSecondPoint;
     Point2D m_arcPreviewPoint;
     COLORREF m_hatchColor;
+    double m_selectionMoveTotalDx;
+    double m_selectionMoveTotalDy;
 
     std::shared_ptr<CLine> m_pCurrentLine;
+    std::shared_ptr<CLine> m_pendingTextShape;
+    std::vector<std::shared_ptr<CLine>> m_selectionMoveShapes;
     std::vector<std::unique_ptr<CBitmap>> m_colorButtonBitmaps;
+    CEdit m_textInputEdit;
     CShapeManager m_shapeMgr;
     CViewTransform m_transform;
 
@@ -98,6 +111,7 @@ protected:
 	afx_msg void OnBnClickedDraw();
 	afx_msg void OnBnClickedCircle();
 	afx_msg void OnBnClickedRectangle();
+	afx_msg void OnBnClickedText();
 	afx_msg void OnBnClickedArc();
 	afx_msg void OnBnClickedHatch();
 	afx_msg void OnBnClickedSel();
@@ -140,6 +154,7 @@ protected:
 	std::shared_ptr<CLine> CreateRectanglePolyline(const Point2D& first, const Point2D& second) const;
 	std::shared_ptr<CLine> CreateArcPolylineByThreePoints(const Point2D& start, const Point2D& through, const Point2D& end, int segments) const;
 	void ClearSelection();
+	bool HasSelectedLines() const;
 	void ApplySelectionBox();
 	void DeleteSelectedLines();
 	void ApplyColorToSelectedLines(COLORREF color);
@@ -155,8 +170,12 @@ protected:
 	bool HandleCircleToolMouseMove(const Point2D& worldPt);
 	bool HandleRectToolLButtonDown(const Point2D& worldPt);
 	bool HandleRectToolMouseMove(const Point2D& worldPt);
+	bool HandleTextToolLButtonDown(const Point2D& worldPt);
+	bool HandleTextToolMouseMove(const Point2D& worldPt);
 	bool HandleArcToolLButtonDown(const Point2D& worldPt);
 	bool HandleArcToolMouseMove(const Point2D& worldPt);
+	void BeginTextInput(const std::shared_ptr<CLine>& textShape);
+	void CommitTextInput(bool acceptInput);
 	bool HandleHatchToolLButtonDown(const CPoint& localPt);
 	bool HandleHatchToolMouseMove(const CPoint& localPt, bool inCanvas);
 	bool HandleSelectionToolLButtonDown(const CPoint& localPt);

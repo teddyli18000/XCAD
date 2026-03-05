@@ -114,3 +114,36 @@ void CChangeLineFillCommand::Undo() {
         m_line->SetFill(m_oldHasFill, m_oldFillColor);
     }
 }
+
+// 功能：构造“平移多条线”命令对象。
+CMoveLinesCommand::CMoveLinesCommand(CShapeManager* mgr, std::vector<std::shared_ptr<CLine>> lines, double dx, double dy, bool alreadyApplied)
+    : m_pManager(mgr),
+    m_lines(std::move(lines)),
+    m_dx(dx),
+    m_dy(dy),
+    m_hasExecuted(alreadyApplied) {
+}
+
+// 功能：执行平移命令。
+void CMoveLinesCommand::Execute() {
+    UNREFERENCED_PARAMETER(m_pManager);
+    if (!m_hasExecuted) {
+        for (const auto& line : m_lines) {
+            if (line) {
+                line->Move(m_dx, m_dy);
+            }
+        }
+    }
+    m_hasExecuted = true;
+}
+
+// 功能：撤销平移命令。
+void CMoveLinesCommand::Undo() {
+    if (!m_hasExecuted) return;
+    for (const auto& line : m_lines) {
+        if (line) {
+            line->Move(-m_dx, -m_dy);
+        }
+    }
+    m_hasExecuted = false;
+}

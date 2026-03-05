@@ -27,6 +27,8 @@ void CCADDlg::ProcessCommandLine(const CString& cmd) {
         ActivateCommand(CADCommandType::CIRCLE);
     } else if (normalized == _T("REC") || normalized == _T("RECT") || normalized == _T("RECTANGLE") || normalized == _T("RECTANG")) {
         ActivateCommand(CADCommandType::RECTANGLE);
+    } else if (normalized == _T("T") || normalized == _T("TEXT")) {
+        ActivateCommand(CADCommandType::TEXT);
     } else if (normalized == _T("A") || normalized == _T("ARC")) {
         ActivateCommand(CADCommandType::ARC);
     } else if (normalized == _T("H") || normalized == _T("HATCH")) {
@@ -83,6 +85,21 @@ void CCADDlg::ProcessCommandLine(const CString& cmd) {
 // 3) 最后回落到基类消息流程，保持 MFC 默认行为。
 BOOL CCADDlg::PreTranslateMessage(MSG* pMsg) {
     if (pMsg->message == WM_KEYDOWN) {
+        if (m_bTextInputActive) {
+            if (pMsg->wParam == VK_RETURN) {
+                CommitTextInput(true);
+                RefreshCanvas();
+                FocusCommandLine();
+                return TRUE;
+            }
+            if (pMsg->wParam == VK_ESCAPE) {
+                CommitTextInput(false);
+                RefreshCanvas();
+                FocusCommandLine();
+                return TRUE;
+            }
+        }
+
         const bool ctrlDown = (GetKeyState(VK_CONTROL) & kKeyDownMask) != 0;
 
         if (ctrlDown && (pMsg->wParam == 'Z' || pMsg->wParam == 'z')) {

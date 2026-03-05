@@ -66,6 +66,23 @@ void CCADDlg::DrawPreview(CDC* pDC) {
         pDC->SelectObject(oldPen);
     }
 
+    if (m_bTextCommandActive && m_bTextFirstPicked) {
+        CPoint p1 = m_transform.WorldToScreen(m_textFirstPoint);
+        CPoint p3 = m_transform.WorldToScreen(m_textPreviewPoint);
+        CRect textRect(min(p1.x, p3.x), min(p1.y, p3.y), max(p1.x, p3.x), max(p1.y, p3.y));
+
+        CPen dashPen(PS_DASH, kPreviewLineWidth, kPreviewDashColor);
+        CPen* oldPen = pDC->SelectObject(&dashPen);
+        CBrush* oldBrush = static_cast<CBrush*>(pDC->SelectStockObject(NULL_BRUSH));
+        int oldBkMode = pDC->SetBkMode(TRANSPARENT);
+
+        pDC->Rectangle(&textRect);
+
+        pDC->SetBkMode(oldBkMode);
+        pDC->SelectObject(oldBrush);
+        pDC->SelectObject(oldPen);
+    }
+
     if (m_bArcCommandActive && m_arcPointCount > 0) {
         CPen dashPen(PS_DASH, kPreviewLineWidth, kPreviewDashColor);
         CPen* oldPen = pDC->SelectObject(&dashPen);

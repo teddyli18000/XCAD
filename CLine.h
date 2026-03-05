@@ -2,6 +2,7 @@
 
 #include "Point2D.h"
 #include <afxwin.h>
+#include <string>
 #include <vector>
 
 class CViewTransform;
@@ -14,6 +15,8 @@ private:
     COLORREF m_color;
     bool m_hasFill;
     COLORREF m_fillColor;
+    bool m_isTextEntity;
+    std::wstring m_textContent;
 
 public:
     // 功能：构造线条对象。
@@ -26,6 +29,10 @@ public:
     void SetFill(bool hasFill, COLORREF fillColor);//设置填充属性
     bool HasFill() const;//是否填充
 	COLORREF GetFillColor() const;//读取填充颜色
+    void SetTextEntity(bool isTextEntity);
+    bool IsTextEntity() const;
+    void SetTextContent(const std::wstring& text);
+    const std::wstring& GetTextContent() const;
 
 	const std::vector<Point2D>& GetPoints() const;//读取点集
 

@@ -67,6 +67,7 @@ BEGIN_MESSAGE_MAP(CCADDlg, CDialogEx)
     ON_BN_CLICKED(IDC_DRAW_LINE, &CCADDlg::OnBnClickedDraw)
     ON_BN_CLICKED(IDC_DRAW_CIRCLE, &CCADDlg::OnBnClickedCircle)
     ON_BN_CLICKED(IDC_DRAW_RECT, &CCADDlg::OnBnClickedRectangle)
+    ON_BN_CLICKED(IDC_DRAW_TEXT, &CCADDlg::OnBnClickedText)
     ON_BN_CLICKED(IDC_DRAW_ARC, &CCADDlg::OnBnClickedArc)
     ON_BN_CLICKED(IDC_HATCH, &CCADDlg::OnBnClickedHatch)
     ON_BN_CLICKED(IDC_SEL, &CCADDlg::OnBnClickedSel)
@@ -110,28 +111,37 @@ CCADDlg::CCADDlg(CWnd* pParent)
     , m_bCircleCenterPicked(false)
     , m_bRectangleCommandActive(false)
     , m_bRectangleFirstPicked(false)
+    , m_bTextCommandActive(false)
+    , m_bTextFirstPicked(false)
+    , m_bTextInputActive(false)
     , m_bArcCommandActive(false)
     , m_bHatchCommandActive(false)
     , m_bEraserCommandActive(false)
     , m_bDeleteNodeCommandActive(false)
     , m_bHatchPreviewVisible(false)
     , m_bIsSelectingBox(false)
+    , m_bIsMovingSelection(false)
     , m_bIsErasing(false)
     , m_bEraserCursorVisible(false)
     , m_arcPointCount(0)
     , m_eraserRadius(kEraserRadiusDefault)
     , m_selectBoxStart(0, 0)
     , m_selectBoxEnd(0, 0)
+    , m_selectionMoveLastPt(0, 0)
     , m_eraserCursor(0, 0)
     , m_hatchPreviewPoint(0, 0)
     , m_circleCenter(0.0, 0.0)
     , m_circlePreviewPoint(0.0, 0.0)
     , m_rectFirstPoint(0.0, 0.0)
     , m_rectPreviewPoint(0.0, 0.0)
+    , m_textFirstPoint(0.0, 0.0)
+    , m_textPreviewPoint(0.0, 0.0)
     , m_arcStartPoint(0.0, 0.0)
     , m_arcSecondPoint(0.0, 0.0)
     , m_arcPreviewPoint(0.0, 0.0)
-    , m_hatchColor(kCadColorWhite) {
+    , m_hatchColor(kCadColorWhite)
+    , m_selectionMoveTotalDx(0.0)
+    , m_selectionMoveTotalDy(0.0) {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
@@ -208,9 +218,10 @@ void CCADDlg::UpdateModeButtonHighlight() {
     const bool lineActive = (m_currentMode == CADMode::MODE_DRAW && m_bLineCommandActive);
     const bool circleActive = (m_currentMode == CADMode::MODE_DRAW && m_bCircleCommandActive);
     const bool rectActive = (m_currentMode == CADMode::MODE_DRAW && m_bRectangleCommandActive);
+    const bool textActive = (m_currentMode == CADMode::MODE_DRAW && m_bTextCommandActive);
     const bool arcActive = (m_currentMode == CADMode::MODE_DRAW && m_bArcCommandActive);
     const bool hatchActive = (m_currentMode == CADMode::MODE_SELECT && m_bHatchCommandActive);
-    const bool drawModeActive = lineActive || circleActive || rectActive || arcActive || hatchActive;
+    const bool drawModeActive = lineActive || circleActive || rectActive || textActive || arcActive || hatchActive;
     const bool eraseActive = (m_currentMode == CADMode::MODE_SELECT && m_bEraserCommandActive);
     const bool deleteNodeActive = (m_currentMode == CADMode::MODE_SELECT && m_bDeleteNodeCommandActive);
     const bool selectModeActive = (m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteNodeCommandActive && !m_bHatchCommandActive);
@@ -219,6 +230,7 @@ void CCADDlg::UpdateModeButtonHighlight() {
     SetButtonPushedState(this, IDC_DRAW_LINE, lineActive);
     SetButtonPushedState(this, IDC_DRAW_CIRCLE, circleActive);
     SetButtonPushedState(this, IDC_DRAW_RECT, rectActive);
+    SetButtonPushedState(this, IDC_DRAW_TEXT, textActive);
     SetButtonPushedState(this, IDC_DRAW_ARC, arcActive);
     SetButtonPushedState(this, IDC_HATCH, hatchActive);
     SetButtonPushedState(this, IDC_DEL_POINT, deleteNodeActive);
@@ -234,6 +246,8 @@ void CCADDlg::OnSetFocus(CWnd* pOldWnd) {
 
 // 功能：将焦点定位到命令行输入框，并把光标放到末尾。
 void CCADDlg::FocusCommandLine() {
+    if (m_bTextInputActive) return;
+
     CWnd* cmd = GetDlgItem(IDC_CMD_LINE);
     if (!cmd || !::IsWindow(cmd->GetSafeHwnd())) return;
 
@@ -258,12 +272,15 @@ void CCADDlg::RefreshCanvas() {
 
 // 功能：激活指定命令并重置其他工具状态。
 void CCADDlg::ActivateCommand(CADCommandType commandType) {
+    CommitTextInput(true);
     ClearSelection();
     m_bLineCommandActive = false;
     m_bCircleCommandActive = false;
     m_bCircleCenterPicked = false;
     m_bRectangleCommandActive = false;
     m_bRectangleFirstPicked = false;
+    m_bTextCommandActive = false;
+    m_bTextFirstPicked = false;
     m_bArcCommandActive = false;
     m_bHatchCommandActive = false;
     m_bEraserCommandActive = false;
@@ -285,6 +302,9 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
     } else if (commandType == CADCommandType::RECTANGLE) {
         m_currentMode = CADMode::MODE_DRAW;
         m_bRectangleCommandActive = true;
+    } else if (commandType == CADCommandType::TEXT) {
+        m_currentMode = CADMode::MODE_DRAW;
+        m_bTextCommandActive = true;
     } else if (commandType == CADCommandType::ARC) {
         m_currentMode = CADMode::MODE_DRAW;
         m_bArcCommandActive = true;
@@ -340,6 +360,11 @@ void CCADDlg::OnBnClickedCircle() {
 // 功能：激活矩形绘制命令。
 void CCADDlg::OnBnClickedRectangle() {
     ActivateCommand(CADCommandType::RECTANGLE);
+}
+
+// 功能：激活文字绘制命令。
+void CCADDlg::OnBnClickedText() {
+    ActivateCommand(CADCommandType::TEXT);
 }
 
 // 功能：激活圆弧绘制命令。

@@ -134,6 +134,9 @@
     <ClCompile Include="Draw_tools\RectTool.cpp">
       <Filter>Draw_tools</Filter>
     </ClCompile>
+    <ClCompile Include="Draw_tools\TextTool.cpp">
+      <Filter>Draw_tools</Filter>
+    </ClCompile>
     <ClCompile Include="Draw_tools\SelectionTool.cpp">
       <Filter>Draw_tools</Filter>
     </ClCompile>
@@ -166,3 +169,4 @@
     </Image>
   </ItemGroup>
 </Project>
+

@@ -9,6 +9,9 @@ const COLORREF kCadColorWhite = RGB(255, 255, 255);
 const COLORREF kCadColorBlue = RGB(0, 0, 255);
 const int kLineWidth = 1;
 const int kPointMarkerHalfSize = 3;
+const int kTextInset = 2;
+const int kTextMinPixelHeight = 14;
+const int kTextMaxPixelHeight = 72;
 const double kPointEqualEpsilon = 1e-9;//接近阈值
 const int kMinClosedPointCount = 3;
 
@@ -23,7 +26,7 @@ bool IsClosedPolylinePoints(const std::vector<Point2D>& points) {
 }
 
 //构造线条对象并初始化默认显示属性
-CLine::CLine() : m_bSelected(false), m_color(kCadColorWhite), m_hasFill(false), m_fillColor(kCadColorWhite) {}
+CLine::CLine() : m_bSelected(false), m_color(kCadColorWhite), m_hasFill(false), m_fillColor(kCadColorWhite), m_isTextEntity(false), m_textContent() {}
 
 //在线条末尾追加一个顶点
 void CLine::AddPoint(const Point2D& pt) { m_points.push_back(pt); }
@@ -52,6 +55,18 @@ bool CLine::HasFill() const { return m_hasFill; }
 //读取填充颜色
 COLORREF CLine::GetFillColor() const { return m_fillColor; }
 
+//设置是否为文本图元
+void CLine::SetTextEntity(bool isTextEntity) { m_isTextEntity = isTextEntity; }
+
+//读取是否为文本图元
+bool CLine::IsTextEntity() const { return m_isTextEntity; }
+
+//设置文本内容
+void CLine::SetTextContent(const std::wstring& text) { m_textContent = text; }
+
+//读取文本内容
+const std::wstring& CLine::GetTextContent() const { return m_textContent; }
+
 //读取线条点集(read-only)
 const std::vector<Point2D>& CLine::GetPoints() const { return m_points; }
 
@@ -66,6 +81,65 @@ void CLine::Move(double dx, double dy) {
 //绘制线条、填充与顶点标记
 void CLine::Draw(CDC* pDC, const CViewTransform& transform, bool bShowPoints) const {
     if (m_points.empty()) return;
+
+    if (m_isTextEntity) {
+        CRect textRect;
+        textRect.left = LONG_MAX;
+        textRect.top = LONG_MAX;
+        textRect.right = LONG_MIN;
+        textRect.bottom = LONG_MIN;
+
+        for (const auto& p : m_points) {
+            const CPoint spt = transform.WorldToScreen(p);
+            if (spt.x < textRect.left) textRect.left = spt.x;
+            if (spt.x > textRect.right) textRect.right = spt.x;
+            if (spt.y < textRect.top) textRect.top = spt.y;
+            if (spt.y > textRect.bottom) textRect.bottom = spt.y;
+        }
+
+        if (textRect.left > textRect.right || textRect.top > textRect.bottom) return;
+
+        if (m_bSelected) {
+            CPen borderPen(PS_DASH, kLineWidth, m_color);
+            CBrush* oldBrush = static_cast<CBrush*>(pDC->SelectStockObject(NULL_BRUSH));
+            CPen* oldPen = pDC->SelectObject(&borderPen);
+            pDC->Rectangle(&textRect);
+            pDC->SelectObject(oldPen);
+            pDC->SelectObject(oldBrush);
+        }
+
+        CRect drawRect = textRect;
+        drawRect.DeflateRect(kTextInset, kTextInset);
+
+        int fontHeightPx = (drawRect.Height() * 3) / 4;
+        if (fontHeightPx < kTextMinPixelHeight) fontHeightPx = kTextMinPixelHeight;
+        if (fontHeightPx > kTextMaxPixelHeight) fontHeightPx = kTextMaxPixelHeight;
+
+        CFont textFont;
+        textFont.CreateFontW(-fontHeightPx, 0, 0, 0, FW_NORMAL, FALSE, FALSE, 0,
+            DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+            CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_SWISS, L"Microsoft YaHei UI");
+        CFont* oldFont = pDC->SelectObject(&textFont);
+
+        const int oldBkMode = pDC->SetBkMode(TRANSPARENT);
+        const COLORREF oldTextColor = pDC->SetTextColor(m_color);
+        pDC->DrawTextW(m_textContent.c_str(), -1, &drawRect, DT_LEFT | DT_TOP | DT_WORDBREAK | DT_NOPREFIX);
+        pDC->SetTextColor(oldTextColor);
+        pDC->SetBkMode(oldBkMode);
+        pDC->SelectObject(oldFont);
+
+        if (bShowPoints || m_bSelected) {
+            CBrush brush(kCadColorBlue);
+            CBrush* pOldBrush = pDC->SelectObject(&brush);
+            for (const auto& pt : m_points) {
+                CPoint spt = transform.WorldToScreen(pt);
+                pDC->Rectangle(spt.x - kPointMarkerHalfSize, spt.y - kPointMarkerHalfSize,
+                    spt.x + kPointMarkerHalfSize, spt.y + kPointMarkerHalfSize);
+            }
+            pDC->SelectObject(pOldBrush);
+        }
+        return;
+    }
 
     if (m_hasFill && IsClosedPolylinePoints(m_points)) {
         std::vector<CPoint> screenPts;

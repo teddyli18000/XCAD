@@ -43,6 +43,8 @@
 #define IDC_COLOR_BLUE                  1034
 #define IDC_COLOR_MAGENTA               1035
 #define IDC_HATCH                       1036
+#define IDC_DRAW_TEXT                   1037
+#define IDC_TEXT_INLINE_EDIT            1100
 
 // Next default values for new objects
 // 
@@ -50,7 +52,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1037
+#define _APS_NEXT_CONTROL_VALUE         1038
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -219,6 +219,7 @@
     <ClCompile Include="Draw_tools\EraserTool.cpp" />
     <ClCompile Include="Draw_tools\LineTool.cpp" />
     <ClCompile Include="Draw_tools\RectTool.cpp" />
+    <ClCompile Include="Draw_tools\TextTool.cpp" />
     <ClCompile Include="Draw_tools\SelectionTool.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -247,3 +248,4 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
+

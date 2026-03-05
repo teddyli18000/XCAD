@@ -20,6 +20,13 @@ const double kZoomOutFactor = 0.8;
 // 3) 根据当前模式把事件交给具体工具处理。
 // 4) 若工具返回 handled，则只刷新画布区域。
 void CCADDlg::OnLButtonDown(UINT nFlags, CPoint point) {
+    if (m_bTextInputActive) {
+        CommitTextInput(true);
+        RefreshCanvas();
+        FocusCommandLine();
+        return;
+    }
+
     CRect rect = m_transform.GetScreenRect();
     if (!rect.PtInRect(point)) {
         CDialogEx::OnLButtonDown(nFlags, point);
@@ -38,6 +45,8 @@ void CCADDlg::OnLButtonDown(UINT nFlags, CPoint point) {
             handled = HandleCircleToolLButtonDown(worldPt);
         } else if (m_bRectangleCommandActive) {
             handled = HandleRectToolLButtonDown(worldPt);
+        } else if (m_bTextCommandActive) {
+            handled = HandleTextToolLButtonDown(worldPt);
         } else if (m_bArcCommandActive) {
             handled = HandleArcToolLButtonDown(worldPt);
         }
@@ -45,7 +54,6 @@ void CCADDlg::OnLButtonDown(UINT nFlags, CPoint point) {
         if (m_bHatchCommandActive) {
             handled = HandleHatchToolLButtonDown(localPt);
         } else {
-            ClearSelection();
             if (m_bEraserCommandActive || m_bDeleteNodeCommandActive) {
                 handled = HandleEraserToolLButtonDown(localPt);
             } else {
@@ -78,6 +86,7 @@ void CCADDlg::OnMouseMove(UINT nFlags, CPoint point) {
     if (HandleLineToolMouseMove(worldPt)
         || HandleCircleToolMouseMove(worldPt)
         || HandleRectToolMouseMove(worldPt)
+        || HandleTextToolMouseMove(worldPt)
         || HandleArcToolMouseMove(worldPt)
         || HandleHatchToolMouseMove(localPt, inCanvas)
         || HandleEraserToolMouseMove(nFlags, localPt, inCanvas)
@@ -147,6 +156,7 @@ void CCADDlg::OnMButtonUp(UINT nFlags, CPoint point) {
 
 // 功能：结束当前折线绘制，并按条件提交命令。
 void CCADDlg::FinishCurrentDrawing(bool keepCommandActive) {
+    CommitTextInput(true);
     if (m_bIsDrawing && m_pCurrentLine) {
         auto& pts = const_cast<std::vector<Point2D>&>(m_pCurrentLine->GetPoints());
         if (pts.size() > 1) pts.pop_back();
@@ -163,6 +173,8 @@ void CCADDlg::FinishCurrentDrawing(bool keepCommandActive) {
     m_bCircleCenterPicked = false;
     m_bRectangleCommandActive = false;
     m_bRectangleFirstPicked = false;
+    m_bTextCommandActive = false;
+    m_bTextFirstPicked = false;
     m_bArcCommandActive = false;
     m_arcPointCount = 0;
     UpdateModeButtonHighlight();
@@ -172,20 +184,27 @@ void CCADDlg::FinishCurrentDrawing(bool keepCommandActive) {
 
 // 功能：取消当前绘制及相关工具状态。
 void CCADDlg::CancelCurrentDrawing() {
+    CommitTextInput(false);
     m_bIsDrawing = false;
     m_bLineCommandActive = false;
     m_bCircleCommandActive = false;
     m_bCircleCenterPicked = false;
     m_bRectangleCommandActive = false;
     m_bRectangleFirstPicked = false;
+    m_bTextCommandActive = false;
+    m_bTextFirstPicked = false;
     m_bArcCommandActive = false;
     m_bHatchCommandActive = false;
     m_bEraserCommandActive = false;
     m_bDeleteNodeCommandActive = false;
     m_bHatchPreviewVisible = false;
     m_bIsSelectingBox = false;
+    m_bIsMovingSelection = false;
     m_bIsErasing = false;
     m_bEraserCursorVisible = false;
+    m_selectionMoveTotalDx = 0.0;
+    m_selectionMoveTotalDy = 0.0;
+    m_selectionMoveShapes.clear();
     m_arcPointCount = 0;
     m_pCurrentLine.reset();
     if (GetCapture() == this) {
@@ -199,6 +218,7 @@ void CCADDlg::CancelCurrentDrawing() {
 
 // 功能：取消当前激活命令，必要时保留已画有效线段。
 void CCADDlg::CancelActiveCommand() {
+    CommitTextInput(false);
     if (m_bIsDrawing && m_bLineCommandActive && m_pCurrentLine) {
         auto& pts = const_cast<std::vector<Point2D>&>(m_pCurrentLine->GetPoints());
         if (pts.size() > 1) pts.pop_back();
@@ -214,14 +234,20 @@ void CCADDlg::CancelActiveCommand() {
     m_bCircleCenterPicked = false;
     m_bRectangleCommandActive = false;
     m_bRectangleFirstPicked = false;
+    m_bTextCommandActive = false;
+    m_bTextFirstPicked = false;
     m_bArcCommandActive = false;
     m_bHatchCommandActive = false;
     m_bEraserCommandActive = false;
     m_bDeleteNodeCommandActive = false;
     m_bHatchPreviewVisible = false;
     m_bIsSelectingBox = false;
+    m_bIsMovingSelection = false;
     m_bIsErasing = false;
     m_bEraserCursorVisible = false;
+    m_selectionMoveTotalDx = 0.0;
+    m_selectionMoveTotalDy = 0.0;
+    m_selectionMoveShapes.clear();
     m_arcPointCount = 0;
 
     if (GetCapture() == this) {
