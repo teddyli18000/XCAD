@@ -22,6 +22,12 @@
     <Filter Include="Command">
       <UniqueIdentifier>{7f917871-98bb-4857-81ee-089224ec6685}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Draw_canvas">
+      <UniqueIdentifier>{b5c85a3f-5c9b-4e19-b5af-149f7ad2566d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Draw_tools">
+      <UniqueIdentifier>{e5b4fd5f-154d-4402-a7e5-b1f11d6467b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CAD.h">
@@ -57,6 +63,12 @@
     <ClInclude Include="CShapeManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CADlgGeometryUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw_canvas\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CAD.cpp">
@@ -79,6 +91,54 @@
     </ClCompile>
     <ClCompile Include="CADlg.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CADlgGeometryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CADlgSelection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CADlgShapeFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CADlgInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CADlgCommandLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CADlgRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw_canvas\CADlgDrawCursor.cpp">
+      <Filter>Draw_canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw_canvas\CADlgDrawModel.cpp">
+      <Filter>Draw_canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw_canvas\CADlgDrawPreview.cpp">
+      <Filter>Draw_canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw_canvas\CADlgDrawSelection.cpp">
+      <Filter>Draw_canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw_tools\CircleTool.cpp">
+      <Filter>Draw_tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw_tools\EraserTool.cpp">
+      <Filter>Draw_tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw_tools\LineTool.cpp">
+      <Filter>Draw_tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw_tools\RectTool.cpp">
+      <Filter>Draw_tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw_tools\SelectionTool.cpp">
+      <Filter>Draw_tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw_tools\ArcTool.cpp">
+      <Filter>Draw_tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

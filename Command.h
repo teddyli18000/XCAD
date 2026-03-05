@@ -36,3 +36,16 @@ public:
     void Execute() override;
     void Undo() override;
 };
+
+class CReplaceLineCommand : public ICadCommand {
+private:
+    CShapeManager* m_pManager;
+    std::shared_ptr<CLine> m_original;
+    std::vector<std::shared_ptr<CLine>> m_replacements;
+
+public:
+    CReplaceLineCommand(CShapeManager* mgr, std::shared_ptr<CLine> original, std::vector<std::shared_ptr<CLine>> replacements);
+
+    void Execute() override;
+    void Undo() override;
+};

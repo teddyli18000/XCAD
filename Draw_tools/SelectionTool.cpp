@@ -2,7 +2,7 @@
 #include "../CADDlg.h"
 
 bool CCADDlg::HandleSelectionToolLButtonDown(const CPoint& localPt) {
-    if (!(m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive)) return false;
+    if (!(m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteNodeCommandActive)) return false;
 
     m_bIsSelectingBox = true;
     m_selectBoxStart = localPt;

@@ -19,7 +19,8 @@ enum class CADCommandType {
     CIRCLE,
     RECTANGLE,
     ARC,
-    ERASER
+    ERASER,
+    DELETE_NODE
 };
 
 
@@ -50,6 +51,7 @@ protected:
     bool m_bRectangleFirstPicked;
     bool m_bArcCommandActive;
     bool m_bEraserCommandActive;
+    bool m_bDeleteNodeCommandActive;
     bool m_bIsSelectingBox;
     bool m_bIsErasing;
     bool m_bEraserCursorVisible;
@@ -107,6 +109,7 @@ protected:
 	afx_msg void OnBnClickedRedo();
 	afx_msg void OnBnClickedAboutIcon();
 	afx_msg void OnBnClickedDelLine();
+	afx_msg void OnBnClickedDelPoint();
 
 	void ProcessCommandLine(const CString& cmd);
 	void CancelCurrentDrawing();

@@ -2,7 +2,7 @@
 #include "../CADDlg.h"
 
 bool CCADDlg::HandleEraserToolLButtonDown(const CPoint& localPt) {
-    if (!(m_currentMode == CADMode::MODE_SELECT && m_bEraserCommandActive)) return false;
+    if (!(m_currentMode == CADMode::MODE_SELECT && (m_bEraserCommandActive || m_bDeleteNodeCommandActive))) return false;
 
     m_bIsErasing = true;
     m_eraserCursor = localPt;
@@ -13,7 +13,7 @@ bool CCADDlg::HandleEraserToolLButtonDown(const CPoint& localPt) {
 }
 
 bool CCADDlg::HandleEraserToolMouseMove(UINT nFlags, const CPoint& localPt, bool inCanvas) {
-    if (!m_bEraserCommandActive) return false;
+    if (!(m_bEraserCommandActive || m_bDeleteNodeCommandActive)) return false;
 
     m_bEraserCursorVisible = inCanvas;
     if (inCanvas) {
@@ -26,7 +26,7 @@ bool CCADDlg::HandleEraserToolMouseMove(UINT nFlags, const CPoint& localPt, bool
 }
 
 bool CCADDlg::HandleEraserToolLButtonUp() {
-    if (!(m_bEraserCommandActive && m_bIsErasing)) return false;
+    if (!((m_bEraserCommandActive || m_bDeleteNodeCommandActive) && m_bIsErasing)) return false;
 
     m_bIsErasing = false;
     if (GetCapture() == this) {

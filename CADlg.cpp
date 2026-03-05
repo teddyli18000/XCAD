@@ -54,6 +54,7 @@ BEGIN_MESSAGE_MAP(CCADDlg, CDialogEx)
     ON_BN_CLICKED(IDC_SAVE_AS, &CCADDlg::OnBnClickedSaveAs)
     ON_BN_CLICKED(IDC_UNDO, &CCADDlg::OnBnClickedUndo)
     ON_BN_CLICKED(IDC_REDO, &CCADDlg::OnBnClickedRedo)
+    ON_BN_CLICKED(IDC_DEL_POINT, &CCADDlg::OnBnClickedDelPoint)
     ON_BN_CLICKED(IDC_DEL_LINE, &CCADDlg::OnBnClickedDelLine)
     ON_BN_CLICKED(IDC_ABOUT_ICON, &CCADDlg::OnBnClickedAboutIcon)
 END_MESSAGE_MAP()
@@ -71,6 +72,7 @@ CCADDlg::CCADDlg(CWnd* pParent)
     , m_bRectangleFirstPicked(false)
     , m_bArcCommandActive(false)
     , m_bEraserCommandActive(false)
+    , m_bDeleteNodeCommandActive(false)
     , m_bIsSelectingBox(false)
     , m_bIsErasing(false)
     , m_bEraserCursorVisible(false)
@@ -122,13 +124,15 @@ void CCADDlg::UpdateModeButtonHighlight() {
     const bool arcActive = (m_currentMode == CADMode::MODE_DRAW && m_bArcCommandActive);
     const bool drawModeActive = lineActive || circleActive || rectActive || arcActive;
     const bool eraseActive = (m_currentMode == CADMode::MODE_SELECT && m_bEraserCommandActive);
-    const bool selectModeActive = (m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive);
+    const bool deleteNodeActive = (m_currentMode == CADMode::MODE_SELECT && m_bDeleteNodeCommandActive);
+    const bool selectModeActive = (m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteNodeCommandActive);
 
     setPushed(IDC_DRAW, drawModeActive);
     setPushed(IDC_DRAW_LINE, lineActive);
     setPushed(IDC_DRAW_CIRCLE, circleActive);
     setPushed(IDC_DRAW_RECT, rectActive);
     setPushed(IDC_DRAW_ARC, arcActive);
+    setPushed(IDC_DEL_POINT, deleteNodeActive);
     setPushed(IDC_SEL, selectModeActive);
     setPushed(IDC_DEL_LINE, eraseActive);
 }
@@ -169,6 +173,7 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
     m_bRectangleFirstPicked = false;
     m_bArcCommandActive = false;
     m_bEraserCommandActive = false;
+    m_bDeleteNodeCommandActive = false;
     m_bIsSelectingBox = false;
     m_bIsErasing = false;
     m_bEraserCursorVisible = false;
@@ -191,6 +196,9 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
     } else if (commandType == CADCommandType::ERASER) {
         m_currentMode = CADMode::MODE_SELECT;
         m_bEraserCommandActive = true;
+    } else if (commandType == CADCommandType::DELETE_NODE) {
+        m_currentMode = CADMode::MODE_SELECT;
+        m_bDeleteNodeCommandActive = true;
     }
 
     UpdateModeButtonHighlight();
@@ -371,6 +379,10 @@ void CCADDlg::OnBnClickedRedo() {
 
 void CCADDlg::OnBnClickedDelLine() {
     ActivateCommand(CADCommandType::ERASER);
+}
+
+void CCADDlg::OnBnClickedDelPoint() {
+    ActivateCommand(CADCommandType::DELETE_NODE);
 }
 
 void CCADDlg::OnBnClickedAboutIcon() {

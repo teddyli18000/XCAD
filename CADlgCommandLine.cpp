@@ -93,7 +93,7 @@ BOOL CCADDlg::PreTranslateMessage(MSG* pMsg) {
         }
 
         if ((pMsg->wParam == VK_DELETE || pMsg->wParam == VK_BACK) &&
-            m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive) {
+            m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteNodeCommandActive) {
             DeleteSelectedLines();
             FocusCommandLine();
             return TRUE;

@@ -4,7 +4,7 @@
 void CCADDlg::DrawCursor(CDC* pDC) {
     if (!pDC) return;
 
-    if (m_bEraserCommandActive && m_bEraserCursorVisible) {
+    if ((m_bEraserCommandActive || m_bDeleteNodeCommandActive) && m_bEraserCursorVisible) {
         CPen pen(PS_SOLID, 1, RGB(255, 255, 255));
         CPen* oldPen = pDC->SelectObject(&pen);
         CBrush* oldBrush = static_cast<CBrush*>(pDC->SelectStockObject(NULL_BRUSH));

@@ -32,7 +32,7 @@ void CCADDlg::OnLButtonDown(UINT nFlags, CPoint point) {
         }
     } else if (m_currentMode == CADMode::MODE_SELECT) {
         ClearSelection();
-        if (m_bEraserCommandActive) {
+        if (m_bEraserCommandActive || m_bDeleteNodeCommandActive) {
             handled = HandleEraserToolLButtonDown(localPt);
         } else {
             handled = HandleSelectionToolLButtonDown(localPt);
@@ -156,6 +156,7 @@ void CCADDlg::CancelCurrentDrawing() {
     m_bRectangleFirstPicked = false;
     m_bArcCommandActive = false;
     m_bEraserCommandActive = false;
+    m_bDeleteNodeCommandActive = false;
     m_bIsSelectingBox = false;
     m_bIsErasing = false;
     m_bEraserCursorVisible = false;
@@ -188,6 +189,7 @@ void CCADDlg::CancelActiveCommand() {
     m_bRectangleFirstPicked = false;
     m_bArcCommandActive = false;
     m_bEraserCommandActive = false;
+    m_bDeleteNodeCommandActive = false;
     m_bIsSelectingBox = false;
     m_bIsErasing = false;
     m_bEraserCursorVisible = false;
