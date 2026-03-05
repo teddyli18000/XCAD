@@ -24,6 +24,14 @@ std::shared_ptr<CLine> CCADDlg::CreateCirclePolyline(const Point2D& center, doub
     if (segments < kMinCircleSegments) segments = kMinCircleSegments;
     if (radius <= 0.0) return circle;
 
+    EntityData data;
+    data.Center = center;
+    data.Radius = radius;
+    data.StartAngle = 0.0;
+    data.EndAngle = kTwoPi;
+    circle->SetEntityType(EntityType::CIRCLE);
+    circle->SetEntityData(data);
+
     for (int i = 0; i <= segments; ++i) {
         const double angle = (kTwoPi * i) / static_cast<double>(segments);
         circle->AddPoint(Point2D(center.x + radius * std::cos(angle), center.y + radius * std::sin(angle)));
@@ -35,6 +43,7 @@ std::shared_ptr<CLine> CCADDlg::CreateCirclePolyline(const Point2D& center, doub
 // 功能：根据对角点构造闭合矩形折线。
 std::shared_ptr<CLine> CCADDlg::CreateRectanglePolyline(const Point2D& first, const Point2D& second) const {
     std::shared_ptr<CLine> rect = std::make_shared<CLine>();
+    rect->SetEntityType(EntityType::RECTANGLE);
     const Point2D p1(first.x, first.y);
     const Point2D p2(second.x, first.y);
     const Point2D p3(second.x, second.y);
@@ -84,6 +93,19 @@ std::shared_ptr<CLine> CCADDlg::CreateArcPolylineByThreePoints(const Point2D& st
     const double spanCCW = cad::dlg::AngleDistanceCCW(aStart, aEnd);
     const double throughCCW = cad::dlg::AngleDistanceCCW(aStart, aThrough);
     const bool ccw = throughCCW <= spanCCW;
+
+    EntityData data;
+    data.Center = center;
+    data.Radius = radius;
+    data.StartAngle = aStart;
+    if (ccw) {
+        data.EndAngle = aStart + spanCCW;
+    } else {
+        const double spanCW = kTwoPi - spanCCW;
+        data.EndAngle = aStart - spanCW;
+    }
+    arc->SetEntityType(EntityType::ARC);
+    arc->SetEntityData(data);
 
     if (segments < kArcPreviewMinSegments) segments = kArcPreviewMinSegments;
     for (int i = 0; i <= segments; ++i) {

@@ -7,6 +7,24 @@
 
 class CViewTransform;
 
+enum class EntityType {
+    LINE,
+    CIRCLE,
+    ARC,
+    RECTANGLE
+};
+
+struct EntityData {
+    Point2D Center;
+    double Radius;
+    double StartAngle;
+    double EndAngle;
+
+    EntityData()
+        : Center(), Radius(0.0), StartAngle(0.0), EndAngle(0.0) {
+    }
+};
+
 // line/polyline model
 class CLine {
 private:
@@ -17,6 +35,8 @@ private:
     COLORREF m_fillColor;
     bool m_isTextEntity;
     std::wstring m_textContent;
+    EntityType m_entityType;
+    EntityData m_entityData;
 
 public:
     // 功能：构造线条对象。
@@ -33,6 +53,10 @@ public:
     bool IsTextEntity() const;//是否有text
     void SetTextContent(const std::wstring& text);//读取text
     const std::wstring& GetTextContent() const;
+    void SetEntityType(EntityType type);
+    EntityType GetEntityType() const;
+    void SetEntityData(const EntityData& data);
+    const EntityData& GetEntityData() const;
 
 	const std::vector<Point2D>& GetPoints() const;//读取点集
 

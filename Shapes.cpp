@@ -26,7 +26,7 @@ bool IsClosedPolylinePoints(const std::vector<Point2D>& points) {
 }
 
 //构造线条对象并初始化默认显示属性
-CLine::CLine() : m_bSelected(false), m_color(kCadColorWhite), m_hasFill(false), m_fillColor(kCadColorWhite), m_isTextEntity(false), m_textContent() {}
+CLine::CLine() : m_bSelected(false), m_color(kCadColorWhite), m_hasFill(false), m_fillColor(kCadColorWhite), m_isTextEntity(false), m_textContent(), m_entityType(EntityType::LINE), m_entityData() {}
 
 //在线条末尾追加一个顶点
 void CLine::AddPoint(const Point2D& pt) { m_points.push_back(pt); }
@@ -67,6 +67,18 @@ void CLine::SetTextContent(const std::wstring& text) { m_textContent = text; }
 //读取文本内容
 const std::wstring& CLine::GetTextContent() const { return m_textContent; }
 
+// 设置图元语义类型
+void CLine::SetEntityType(EntityType type) { m_entityType = type; }
+
+// 读取图元语义类型
+EntityType CLine::GetEntityType() const { return m_entityType; }
+
+// 设置图元参数元数据
+void CLine::SetEntityData(const EntityData& data) { m_entityData = data; }
+
+// 读取图元参数元数据
+const EntityData& CLine::GetEntityData() const { return m_entityData; }
+
 //读取线条点集(read-only)
 const std::vector<Point2D>& CLine::GetPoints() const { return m_points; }
 
@@ -75,6 +87,11 @@ void CLine::Move(double dx, double dy) {
     for (auto& pt : m_points) {
         pt.x += dx;
         pt.y += dy;
+    }
+
+    if (m_entityType == EntityType::CIRCLE || m_entityType == EntityType::ARC) {
+        m_entityData.Center.x += dx;
+        m_entityData.Center.y += dy;
     }
 }
 

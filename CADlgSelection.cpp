@@ -220,7 +220,9 @@ void CCADDlg::EraseAtPoint(const CPoint& localPt) {
             bestDist2 = shapeBestDist2;
             bestShape = shape;
             bestSegEndIndex = shapeBestSegEndIndex;
-            bestIsCurve = IsSmoothCurvePolyline(pts);
+            const EntityType entityType = shape->GetEntityType();
+            const bool isSemanticCurve = (entityType == EntityType::CIRCLE || entityType == EntityType::ARC);
+            bestIsCurve = isSemanticCurve || IsSmoothCurvePolyline(pts);
         }
     }
 
