@@ -1,5 +1,6 @@
 #pragma once
 
+#include <afxwin.h>
 #include <memory>
 #include <vector>
 
@@ -20,6 +21,20 @@ private:
 
 public:
     CAddLineCommand(CShapeManager* mgr, std::shared_ptr<CLine> line);
+
+    void Execute() override;
+    void Undo() override;
+};
+
+class CChangeLineColorCommand : public ICadCommand {
+private:
+    CShapeManager* m_pManager;
+    std::vector<std::shared_ptr<CLine>> m_lines;
+    std::vector<COLORREF> m_oldColors;
+    COLORREF m_newColor;
+
+public:
+    CChangeLineColorCommand(CShapeManager* mgr, std::vector<std::shared_ptr<CLine>> lines, COLORREF newColor);
 
     void Execute() override;
     void Undo() override;

@@ -6,6 +6,7 @@
 #include "CViewTransform.h"
 
 #include <memory>
+#include <vector>
 
 enum class CADMode {
     MODE_NONE,
@@ -70,6 +71,7 @@ protected:
     Point2D m_arcPreviewPoint;
 
     std::shared_ptr<CLine> m_pCurrentLine;
+    std::vector<std::unique_ptr<CBitmap>> m_colorButtonBitmaps;
     CShapeManager m_shapeMgr;
     CViewTransform m_transform;
 
@@ -110,6 +112,13 @@ protected:
 	afx_msg void OnBnClickedAboutIcon();
 	afx_msg void OnBnClickedDelLine();
 	afx_msg void OnBnClickedDelPoint();
+	afx_msg void OnBnClickedColorWhite();
+	afx_msg void OnBnClickedColorRed();
+	afx_msg void OnBnClickedColorYellow();
+	afx_msg void OnBnClickedColorGreen();
+	afx_msg void OnBnClickedColorCyan();
+	afx_msg void OnBnClickedColorBlue();
+	afx_msg void OnBnClickedColorMagenta();
 
 	void ProcessCommandLine(const CString& cmd);
 	void CancelCurrentDrawing();
@@ -126,6 +135,7 @@ protected:
 	void ClearSelection();
 	void ApplySelectionBox();
 	void DeleteSelectedLines();
+	void ApplyColorToSelectedLines(COLORREF color);
 	void EraseAtPoint(const CPoint& localPt);
 	void DrawModel(CDC* pDC);
 	void DrawPreview(CDC* pDC);

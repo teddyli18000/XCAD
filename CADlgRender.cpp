@@ -5,7 +5,50 @@
 
 // 渲染模块 / rendering module
 
+namespace {
+bool TryGetPaletteColor(int ctrlId, COLORREF& color) {
+    switch (ctrlId) {
+    case IDC_COLOR_WHITE: color = RGB(255, 255, 255); return true;
+    case IDC_COLOR_RED: color = RGB(255, 0, 0); return true;
+    case IDC_COLOR_YELLOW: color = RGB(255, 255, 0); return true;
+    case IDC_COLOR_GREEN: color = RGB(0, 255, 0); return true;
+    case IDC_COLOR_CYAN: color = RGB(0, 255, 255); return true;
+    case IDC_COLOR_BLUE: color = RGB(0, 0, 255); return true;
+    case IDC_COLOR_MAGENTA: color = RGB(255, 0, 255); return true;
+    default: return false;
+    }
+}
+}
+
 void CCADDlg::DrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
+    COLORREF paletteColor = RGB(0, 0, 0);
+    if (TryGetPaletteColor(nIDCtl, paletteColor)) {
+        CDC dc;
+        dc.Attach(lpDrawItemStruct->hDC);
+
+        CRect rc = lpDrawItemStruct->rcItem;
+        dc.FillSolidRect(&rc, GetSysColor(COLOR_3DFACE));
+
+        dc.Draw3dRect(&rc, RGB(30, 30, 30), RGB(220, 220, 220));
+
+        CRect square = rc;
+        square.DeflateRect(2, 2);
+        CBrush brush(paletteColor);
+        CPen pen(PS_SOLID, 1, RGB(20, 20, 20));
+        CPen* oldPen = dc.SelectObject(&pen);
+        CBrush* oldBrush = dc.SelectObject(&brush);
+        dc.Rectangle(&square);
+        dc.SelectObject(oldBrush);
+        dc.SelectObject(oldPen);
+
+        if ((lpDrawItemStruct->itemState & ODS_FOCUS) != 0) {
+            dc.DrawFocusRect(&rc);
+        }
+
+        dc.Detach();
+        return;
+    }
+
     if (nIDCtl == IDC_ABOUT_ICON) {
         CDC dc;
         dc.Attach(lpDrawItemStruct->hDC);

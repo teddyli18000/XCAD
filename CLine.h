@@ -10,6 +10,7 @@ class CLine {
 private:
     std::vector<Point2D> m_points;
     bool m_bSelected;
+    COLORREF m_color;
 
 public:
     CLine();
@@ -17,6 +18,8 @@ public:
     void AddPoint(const Point2D& pt);
     void SetSelected(bool sel);
     bool IsSelected() const;
+    void SetColor(COLORREF color);
+    COLORREF GetColor() const;
 
     const std::vector<Point2D>& GetPoints() const;
 

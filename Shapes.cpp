@@ -2,13 +2,17 @@
 #include "CLine.h"
 #include "CViewTransform.h"
 
-CLine::CLine() : m_bSelected(false) {}
+CLine::CLine() : m_bSelected(false), m_color(RGB(255, 255, 255)) {}
 
 void CLine::AddPoint(const Point2D& pt) { m_points.push_back(pt); }
 
 void CLine::SetSelected(bool sel) { m_bSelected = sel; }
 
 bool CLine::IsSelected() const { return m_bSelected; }
+
+void CLine::SetColor(COLORREF color) { m_color = color; }
+
+COLORREF CLine::GetColor() const { return m_color; }
 
 const std::vector<Point2D>& CLine::GetPoints() const { return m_points; }
 
@@ -22,7 +26,7 @@ void CLine::Move(double dx, double dy) {
 void CLine::Draw(CDC* pDC, const CViewTransform& transform, bool bShowPoints) const {
     if (m_points.empty()) return;
 
-    CPen pen(m_bSelected ? PS_DASH : PS_SOLID, 1, m_bSelected ? RGB(255, 0, 0) : RGB(255, 255, 255));
+    CPen pen(m_bSelected ? PS_DASH : PS_SOLID, 1, m_color);
     CPen* pOldPen = pDC->SelectObject(&pen);
 
     CPoint startPt = transform.WorldToScreen(m_points[0]);

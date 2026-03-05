@@ -44,3 +44,28 @@ void CReplaceLineCommand::Undo() {
     }
     m_pManager->AddShape(m_original);
 }
+
+CChangeLineColorCommand::CChangeLineColorCommand(CShapeManager* mgr, std::vector<std::shared_ptr<CLine>> lines, COLORREF newColor)
+    : m_pManager(mgr), m_lines(std::move(lines)), m_newColor(newColor) {
+    m_oldColors.reserve(m_lines.size());
+    for (const auto& line : m_lines) {
+        m_oldColors.push_back(line ? line->GetColor() : RGB(255, 255, 255));
+    }
+}
+
+void CChangeLineColorCommand::Execute() {
+    UNREFERENCED_PARAMETER(m_pManager);
+    for (const auto& line : m_lines) {
+        if (line) {
+            line->SetColor(m_newColor);
+        }
+    }
+}
+
+void CChangeLineColorCommand::Undo() {
+    for (size_t i = 0; i < m_lines.size() && i < m_oldColors.size(); ++i) {
+        if (m_lines[i]) {
+            m_lines[i]->SetColor(m_oldColors[i]);
+        }
+    }
+}

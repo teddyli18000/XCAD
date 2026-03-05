@@ -5,6 +5,7 @@
 #include "afxdialogex.h"
 
 #include <afxdlgs.h>
+#include <vector>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -56,6 +57,13 @@ BEGIN_MESSAGE_MAP(CCADDlg, CDialogEx)
     ON_BN_CLICKED(IDC_REDO, &CCADDlg::OnBnClickedRedo)
     ON_BN_CLICKED(IDC_DEL_POINT, &CCADDlg::OnBnClickedDelPoint)
     ON_BN_CLICKED(IDC_DEL_LINE, &CCADDlg::OnBnClickedDelLine)
+    ON_BN_CLICKED(IDC_COLOR_WHITE, &CCADDlg::OnBnClickedColorWhite)
+    ON_BN_CLICKED(IDC_COLOR_RED, &CCADDlg::OnBnClickedColorRed)
+    ON_BN_CLICKED(IDC_COLOR_YELLOW, &CCADDlg::OnBnClickedColorYellow)
+    ON_BN_CLICKED(IDC_COLOR_GREEN, &CCADDlg::OnBnClickedColorGreen)
+    ON_BN_CLICKED(IDC_COLOR_CYAN, &CCADDlg::OnBnClickedColorCyan)
+    ON_BN_CLICKED(IDC_COLOR_BLUE, &CCADDlg::OnBnClickedColorBlue)
+    ON_BN_CLICKED(IDC_COLOR_MAGENTA, &CCADDlg::OnBnClickedColorMagenta)
     ON_BN_CLICKED(IDC_ABOUT_ICON, &CCADDlg::OnBnClickedAboutIcon)
 END_MESSAGE_MAP()
 
@@ -104,6 +112,52 @@ BOOL CCADDlg::OnInitDialog() {
         ScreenToClient(&rect);
         m_transform.SetScreenRect(rect);
         GetDlgItem(IDC_DRAW_AREA)->ShowWindow(SW_HIDE);
+    }
+
+    struct ColorButtonDef { int ctrlId; COLORREF color; };
+    const ColorButtonDef colorButtons[] = {
+        { IDC_COLOR_WHITE, RGB(255, 255, 255) },
+        { IDC_COLOR_RED, RGB(255, 0, 0) },
+        { IDC_COLOR_YELLOW, RGB(255, 255, 0) },
+        { IDC_COLOR_GREEN, RGB(0, 255, 0) },
+        { IDC_COLOR_CYAN, RGB(0, 255, 255) },
+        { IDC_COLOR_BLUE, RGB(0, 0, 255) },
+        { IDC_COLOR_MAGENTA, RGB(255, 0, 255) }
+    };
+
+    m_colorButtonBitmaps.clear();
+    m_colorButtonBitmaps.reserve(_countof(colorButtons));
+    CClientDC clientDC(this);
+    for (const auto& def : colorButtons) {
+        CWnd* button = GetDlgItem(def.ctrlId);
+        if (!button || !::IsWindow(button->GetSafeHwnd())) continue;
+
+        CRect rc;
+        button->GetClientRect(&rc);
+        const int w = (rc.Width() > 4) ? rc.Width() : 12;
+        const int h = (rc.Height() > 4) ? rc.Height() : 12;
+
+        auto bmp = std::make_unique<CBitmap>();
+        if (!bmp->CreateCompatibleBitmap(&clientDC, w, h)) continue;
+
+        CDC memDC;
+        memDC.CreateCompatibleDC(&clientDC);
+        CBitmap* oldBmp = memDC.SelectObject(bmp.get());
+
+        memDC.FillSolidRect(0, 0, w, h, GetSysColor(COLOR_3DFACE));
+        CRect square(1, 1, w - 1, h - 1);
+        memDC.FillSolidRect(&square, def.color);
+        memDC.Draw3dRect(&square, RGB(0, 0, 0), RGB(0, 0, 0));
+
+        memDC.SelectObject(oldBmp);
+
+        button->ModifyStyle(BS_TYPEMASK, BS_BITMAP);
+        button->SetWindowText(_T(""));
+        button->SendMessage(BM_SETIMAGE, IMAGE_BITMAP, reinterpret_cast<LPARAM>(bmp->GetSafeHandle()));
+        button->ShowWindow(SW_SHOW);
+        button->Invalidate();
+
+        m_colorButtonBitmaps.push_back(std::move(bmp));
     }
 
     UpdateModeButtonHighlight();
@@ -384,6 +438,38 @@ void CCADDlg::OnBnClickedDelLine() {
 void CCADDlg::OnBnClickedDelPoint() {
     ActivateCommand(CADCommandType::DELETE_NODE);
 }
+
+void CCADDlg::ApplyColorToSelectedLines(COLORREF color) {
+    std::vector<std::shared_ptr<CLine>> selected;
+    for (const auto& shape : m_shapeMgr.GetShapes()) {
+        if (shape->IsSelected()) {
+            selected.push_back(shape);
+        }
+    }
+
+    if (selected.empty()) {
+        FocusCommandLine();
+        return;
+    }
+
+    m_shapeMgr.ExecuteCommand(std::make_unique<CChangeLineColorCommand>(&m_shapeMgr, std::move(selected), color));
+    RefreshCanvas();
+    FocusCommandLine();
+}
+
+void CCADDlg::OnBnClickedColorWhite() { ApplyColorToSelectedLines(RGB(255, 255, 255)); }
+
+void CCADDlg::OnBnClickedColorRed() { ApplyColorToSelectedLines(RGB(255, 0, 0)); }
+
+void CCADDlg::OnBnClickedColorYellow() { ApplyColorToSelectedLines(RGB(255, 255, 0)); }
+
+void CCADDlg::OnBnClickedColorGreen() { ApplyColorToSelectedLines(RGB(0, 255, 0)); }
+
+void CCADDlg::OnBnClickedColorCyan() { ApplyColorToSelectedLines(RGB(0, 255, 255)); }
+
+void CCADDlg::OnBnClickedColorBlue() { ApplyColorToSelectedLines(RGB(0, 0, 255)); }
+
+void CCADDlg::OnBnClickedColorMagenta() { ApplyColorToSelectedLines(RGB(255, 0, 255)); }
 
 void CCADDlg::OnBnClickedAboutIcon() {
     CDialogEx aboutDlg(IDD_ABOUTBOX, this);

@@ -18,6 +18,30 @@ std::string Trim(const char* text) {
     }
     return s.substr(start);
 }
+
+int ColorToDxfAci(COLORREF color) {
+    if (color == RGB(255, 0, 0)) return 1;
+    if (color == RGB(255, 255, 0)) return 2;
+    if (color == RGB(0, 255, 0)) return 3;
+    if (color == RGB(0, 255, 255)) return 4;
+    if (color == RGB(0, 0, 255)) return 5;
+    if (color == RGB(255, 0, 255)) return 6;
+    return 7;
+}
+
+COLORREF DxfAciToColor(int aci) {
+    switch (aci) {
+    case 1: return RGB(255, 0, 0);
+    case 2: return RGB(255, 255, 0);
+    case 3: return RGB(0, 255, 0);
+    case 4: return RGB(0, 255, 255);
+    case 5: return RGB(0, 0, 255);
+    case 6: return RGB(255, 0, 255);
+    case 7:
+    default:
+        return RGB(255, 255, 255);
+    }
+}
 }
 
 void CShapeManager::AddShape(std::shared_ptr<CLine> shape) {
@@ -83,7 +107,7 @@ bool CShapeManager::SaveToDXF(const std::wstring& filepath) const {
         const auto& pts = shape->GetPoints();
         if (pts.size() < 2) continue;
 
-        fprintf(fp, "  0\nPOLYLINE\n  8\n0\n 66\n1\n");
+        fprintf(fp, "  0\nPOLYLINE\n  8\n0\n 62\n%d\n 66\n1\n", ColorToDxfAci(shape->GetColor()));
         for (const auto& pt : pts) {
             fprintf(fp, "  0\nVERTEX\n  8\n0\n 10\n%f\n 20\n%f\n 30\n0.0\n", pt.x, pt.y);
         }
@@ -115,6 +139,7 @@ bool CShapeManager::LoadFromDXF(const std::wstring& filepath) {
 
         if (code == 0 && value == "POLYLINE") {
             currentLine = std::make_shared<CLine>();
+            currentLine->SetColor(RGB(255, 255, 255));
             hasPendingX = false;
             continue;
         }
@@ -137,6 +162,8 @@ bool CShapeManager::LoadFromDXF(const std::wstring& filepath) {
             double y = std::atof(value.c_str());
             currentLine->AddPoint(Point2D(pendingX, y));
             hasPendingX = false;
+        } else if (code == 62) {
+            currentLine->SetColor(DxfAciToColor(std::atoi(value.c_str())));
         }
     }
 

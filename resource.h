@@ -35,6 +35,13 @@
 #define IDC_DRAW_RECT                   1026
 #define IDC_DRAW_ARC                    1027
 #define IDC_ABOUT_ICON                  1028
+#define IDC_COLOR_WHITE                 1029
+#define IDC_COLOR_RED                   1030
+#define IDC_COLOR_YELLOW                1031
+#define IDC_COLOR_GREEN                 1032
+#define IDC_COLOR_CYAN                  1033
+#define IDC_COLOR_BLUE                  1034
+#define IDC_COLOR_MAGENTA               1035
 
 // Next default values for new objects
 // 
@@ -42,7 +49,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1006
+#define _APS_NEXT_CONTROL_VALUE         1036
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
