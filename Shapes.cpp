@@ -9,7 +9,7 @@ const COLORREF kCadColorWhite = RGB(255, 255, 255);
 const COLORREF kCadColorBlue = RGB(0, 0, 255);
 const int kLineWidth = 1;
 const int kPointMarkerHalfSize = 3;
-const double kPointEqualEpsilon = 1e-9;
+const double kPointEqualEpsilon = 1e-9;//接近阈值
 const int kMinClosedPointCount = 3;
 
 bool IsClosedPolylinePoints(const std::vector<Point2D>& points) {
@@ -22,40 +22,40 @@ bool IsClosedPolylinePoints(const std::vector<Point2D>& points) {
 }
 }
 
-// 功能：构造线条对象并初始化默认显示属性。
+//构造线条对象并初始化默认显示属性
 CLine::CLine() : m_bSelected(false), m_color(kCadColorWhite), m_hasFill(false), m_fillColor(kCadColorWhite) {}
 
-// 功能：在线条末尾追加一个顶点。
+//在线条末尾追加一个顶点
 void CLine::AddPoint(const Point2D& pt) { m_points.push_back(pt); }
 
-// 功能：设置线条选中状态。
+//设置线条选中状态
 void CLine::SetSelected(bool sel) { m_bSelected = sel; }
 
-// 功能：获取线条选中状态。
+//读取线条选中状态
 bool CLine::IsSelected() const { return m_bSelected; }
 
-// 功能：设置线条颜色。
+//设置线条颜色
 void CLine::SetColor(COLORREF color) { m_color = color; }
 
-// 功能：获取线条颜色。
+//读取线条颜色
 COLORREF CLine::GetColor() const { return m_color; }
 
-// 功能：设置填充开关与填充颜色。
+//设置填充状态
 void CLine::SetFill(bool hasFill, COLORREF fillColor) {
     m_hasFill = hasFill;
     m_fillColor = fillColor;
 }
 
-// 功能：获取是否启用填充。
+//读取是否填充
 bool CLine::HasFill() const { return m_hasFill; }
 
-// 功能：获取填充颜色。
+//读取填充颜色
 COLORREF CLine::GetFillColor() const { return m_fillColor; }
 
-// 功能：获取线条点集（只读）。
+//读取线条点集(read-only)
 const std::vector<Point2D>& CLine::GetPoints() const { return m_points; }
 
-// 功能：整体平移线条点集。
+//整体平移线条点集
 void CLine::Move(double dx, double dy) {
     for (auto& pt : m_points) {
         pt.x += dx;
@@ -63,7 +63,7 @@ void CLine::Move(double dx, double dy) {
     }
 }
 
-// 功能：绘制线条、填充与顶点标记。
+//绘制线条、填充与顶点标记
 void CLine::Draw(CDC* pDC, const CViewTransform& transform, bool bShowPoints) const {
     if (m_points.empty()) return;
 
@@ -107,7 +107,7 @@ void CLine::Draw(CDC* pDC, const CViewTransform& transform, bool bShowPoints) co
     }
 }
 
-// 功能：命中测试占位（当前固定返回 false）。
+//命中测试占位（当前固定返回 false）
 bool CLine::HitTest(const Point2D& pt, double tolerance) const {
     UNREFERENCED_PARAMETER(pt);
     UNREFERENCED_PARAMETER(tolerance);
