@@ -65,6 +65,7 @@ protected:
     bool m_bIsMovingSelection;
     bool m_bIsErasing;
     bool m_bEraserCursorVisible;
+    bool m_bMouseInCanvas;
     int m_arcPointCount;
     int m_eraserRadius;
     CPoint m_lastMousePt;
@@ -72,6 +73,7 @@ protected:
     CPoint m_selectBoxEnd;
     CPoint m_selectionMoveLastPt;
     CPoint m_eraserCursor;
+    CPoint m_mouseCanvasPt;
     CPoint m_hatchPreviewPoint;
     Point2D m_circleCenter;
     Point2D m_circlePreviewPoint;
@@ -168,6 +170,7 @@ protected:
 	void DrawPreview(CDC* pDC);
 	void DrawHatchPreview(CDC* pDC);
 	void DrawSelection(CDC* pDC);
+	void DrawRulers(CDC* pDC);
 	void DrawCursor(CDC* pDC);
 	bool HandleLineToolLButtonDown(const Point2D& worldPt);
 	bool HandleLineToolMouseMove(const Point2D& worldPt);

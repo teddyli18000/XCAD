@@ -71,7 +71,16 @@ void CCADDlg::OnLButtonDown(UINT nFlags, CPoint point) {
 
 //处理鼠标移动，包括平移和各绘图工具的预览更新
 void CCADDlg::OnMouseMove(UINT nFlags, CPoint point) {
+    const bool prevMouseInCanvas = m_bMouseInCanvas;
+    const CPoint prevMouseCanvasPt = m_mouseCanvasPt;
+
     if (m_bIsPanning) {
+        CRect panRect = m_transform.GetScreenRect();
+        m_bMouseInCanvas = panRect.PtInRect(point);
+        if (m_bMouseInCanvas) {
+            m_mouseCanvasPt = CPoint(point.x - panRect.left, point.y - panRect.top);
+        }
+
         m_transform.Pan(point.x - m_lastMousePt.x, point.y - m_lastMousePt.y);
         m_lastMousePt = point;
         RefreshCanvas();
@@ -83,6 +92,11 @@ void CCADDlg::OnMouseMove(UINT nFlags, CPoint point) {
     CPoint localPt(point.x - rect.left, point.y - rect.top);
     Point2D worldPt = m_transform.ScreenToWorld(localPt);
 
+    m_bMouseInCanvas = inCanvas;
+    if (inCanvas) {
+        m_mouseCanvasPt = localPt;
+    }
+
     if (HandleLineToolMouseMove(worldPt)
         || HandleCircleToolMouseMove(worldPt)
         || HandleRectToolMouseMove(worldPt)
@@ -93,6 +107,12 @@ void CCADDlg::OnMouseMove(UINT nFlags, CPoint point) {
         || HandleSelectionToolMouseMove(localPt)) {
         RefreshCanvas();
         return;
+    }
+
+    if (prevMouseInCanvas != m_bMouseInCanvas
+        || (m_bMouseInCanvas
+            && (prevMouseCanvasPt.x != m_mouseCanvasPt.x || prevMouseCanvasPt.y != m_mouseCanvasPt.y))) {
+        RefreshCanvas();
     }
 }
 
