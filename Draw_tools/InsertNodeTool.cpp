@@ -52,7 +52,7 @@ std::shared_ptr<CLine> CreateInsertedLine(const CLine& original, size_t segEndIn
 }
 }
 
-// 功能：插入节点模式下，左键点击时按最近线段插入新节点。
+//插入节点模式下，左键点击时按最近线段插入新节点
 bool CCADDlg::HandleInsertNodeToolLButtonDown(const CPoint& localPt) {
     if (!(m_currentMode == CADMode::MODE_SELECT && m_bInsertNodeCommandActive)) return false;
 
@@ -62,7 +62,7 @@ bool CCADDlg::HandleInsertNodeToolLButtonDown(const CPoint& localPt) {
     return true;
 }
 
-// 功能：更新插入节点模式的容差光标位置。
+//更新插入节点模式的容差光标位置
 bool CCADDlg::HandleInsertNodeToolMouseMove(const CPoint& localPt, bool inCanvas) {
     if (!m_bInsertNodeCommandActive) return false;
 
@@ -73,7 +73,7 @@ bool CCADDlg::HandleInsertNodeToolMouseMove(const CPoint& localPt, bool inCanvas
     return true;
 }
 
-// 功能：在容差范围内查找最近线段，并插入一个新节点。
+//在容差范围内查找最近线段，并插入一个新节点
 void CCADDlg::InsertNodeAtPoint(const CPoint& localPt) {
     if (!m_bInsertNodeCommandActive) return;
 

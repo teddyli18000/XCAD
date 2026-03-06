@@ -25,7 +25,6 @@ bool CCADDlg::HandleCircleToolLButtonDown(const Point2D& worldPt) {
             m_shapeMgr.ExecuteCommand(std::make_unique<CAddLineCommand>(&m_shapeMgr, CreateCirclePolyline(m_circleCenter, radius, kCircleSegments)));
         }
         m_bCircleCenterPicked = false;
-        m_bCircleCommandActive = false;
     }
 
     return true;

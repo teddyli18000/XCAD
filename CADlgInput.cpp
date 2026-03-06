@@ -15,10 +15,10 @@ const double kZoomOutFactor = 0.8;
 
 // 功能：处理鼠标左键按下，按当前模式分发到对应工具。
 // 交互步骤（LButtonDown）：
-// 1) 先判断点击是否在画布内（in canvas）。
-// 2) 坐标从屏幕坐标转换成局部/世界坐标（screen -> local/world）。
-// 3) 根据当前模式把事件交给具体工具处理。
-// 4) 若工具返回 handled，则只刷新画布区域。
+// 1) 先判断点击是否在画布内（in canvas）
+// 2) 坐标从屏幕坐标转换成局部/世界坐标（screen -> local/world）
+// 3) 根据当前模式把事件交给具体工具处理
+// 4) 若工具返回 handled，则只刷新画布区域
 void CCADDlg::OnLButtonDown(UINT nFlags, CPoint point) {
     if (m_bTextInputActive) {
         CommitTextInput(true);

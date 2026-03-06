@@ -41,15 +41,24 @@ void SetButtonPushedState(CCADDlg* pDlg, int ctrlId, bool bPushed) {
 }
 
 // 主对话框模块 / main dialog module
-// 下面函数在本文件被调用前的用法说明：
-// - `CreateCirclePolyline(center, radius, segments)`:
-//   center=圆心(world), radius=半径(world), segments=离散段数(>=8)
-// - `CreateRectanglePolyline(first, second)`:
-//   first/second=对角点(world), 返回闭合矩形折线
-// - `CreateArcPolylineByThreePoints(start, through, end, segments)`:
-//   start=起点, through=经过点, end=终点, segments=插值段数
-// - `RefreshCanvas()`:
-//   仅刷新绘图区，不重绘整个对话框
+// 函数用法说明：
+// CreateLinePolyline(start, end):
+// start/end=起止点(world)，返回一条折线（虽然只有一个线段）
+// 
+// CreateCirclePolyline(center, radius, segments):
+// center=圆心(world), radius=半径(world), segments=离散段数(>=8)
+//
+// CreateRectanglePolyline(first, second):
+// first/second=对角点(world), 返回闭合矩形折线
+// 
+// CreateArcPolylineByThreePoints(start, through, end, segments):
+// start=起点, through=经过点, end=终点, segments=插值段数
+// 
+// CreateTextShape(position, text):
+// position=文字基点(world), text=字符串内容
+// 
+// RefreshCanvas():（修改过，保证无bug）
+// 仅刷新绘图区，不重绘整个对话框
 
 BEGIN_MESSAGE_MAP(CCADDlg, CDialogEx)
     ON_WM_PAINT()
@@ -424,37 +433,37 @@ bool CCADDlg::SaveAsWithDialog() {
     return saved;
 }
 
-//激活直线绘制命令
+//激活line绘制命令
 void CCADDlg::OnBnClickedDraw() {
     ActivateCommand(CADCommandType::LINE);
 }
 
-//激活圆形绘制命令
+//激活circle绘制命令
 void CCADDlg::OnBnClickedCircle() {
     ActivateCommand(CADCommandType::CIRCLE);
 }
 
-//激活矩形绘制命令
+//激活rectangle绘制命令
 void CCADDlg::OnBnClickedRectangle() {
     ActivateCommand(CADCommandType::RECTANGLE);
 }
 
-//激活文字绘制命令
+//激活text绘制命令
 void CCADDlg::OnBnClickedText() {
     ActivateCommand(CADCommandType::TEXT);
 }
 
-//激活圆弧绘制命令
+//激活arc绘制命令
 void CCADDlg::OnBnClickedArc() {
     ActivateCommand(CADCommandType::ARC);
 }
 
-//激活填充命令
+//激活hatch命令
 void CCADDlg::OnBnClickedHatch() {
     ActivateCommand(CADCommandType::HATCH);
 }
 
-//切换到选择模式
+//切换到sel模式
 void CCADDlg::OnBnClickedSel() {
     m_currentMode = CADMode::MODE_SELECT;
     CancelCurrentDrawing();
@@ -530,7 +539,7 @@ void CCADDlg::OnBnClickedMr() {
     FocusCommandLine();
 }
 
-//打开 DXF 文件并加载到当前画布
+//打开DXF文件并加载到当前画布
 void CCADDlg::OnBnClickedOpen() {
     CFileDialog dlg(TRUE, L"dxf", nullptr,
         OFN_FILEMUSTEXIST | OFN_HIDEREADONLY,
@@ -647,35 +656,35 @@ void CCADDlg::ApplyColorToSelectedLines(COLORREF color) {
     FocusCommandLine();
 }
 
-//把选中对象设置为白色
+//把选中对象设置为白色white
 void CCADDlg::OnBnClickedColorWhite() { ApplyColorToSelectedLines(kCadColorWhite); }
 
-//把选中对象设置为红色
+//把选中对象设置为红色red
 void CCADDlg::OnBnClickedColorRed() { ApplyColorToSelectedLines(kCadColorRed); }
 
-//把选中对象设置为黄色
+//把选中对象设置为黄色yellow
 void CCADDlg::OnBnClickedColorYellow() { ApplyColorToSelectedLines(kCadColorYellow); }
 
-//把选中对象设置为绿色
+//把选中对象设置为绿色green
 void CCADDlg::OnBnClickedColorGreen() { ApplyColorToSelectedLines(kCadColorGreen); }
 
-//把选中对象设置为青色
+//把选中对象设置为青色cyan
 void CCADDlg::OnBnClickedColorCyan() { ApplyColorToSelectedLines(kCadColorCyan); }
 
-//把选中对象设置为蓝色
+//把选中对象设置为蓝色blue
 void CCADDlg::OnBnClickedColorBlue() { ApplyColorToSelectedLines(kCadColorBlue); }
 
-//把选中对象设置为洋红色
+//把选中对象设置为洋红色magenta
 void CCADDlg::OnBnClickedColorMagenta() { ApplyColorToSelectedLines(kCadColorMagenta); }
 
-//弹出关于窗口
+//弹出about窗口
 void CCADDlg::OnBnClickedAboutIcon() {
     CDialogEx aboutDlg(IDD_ABOUTBOX, this);
     aboutDlg.DoModal();
     FocusCommandLine();
 }
 
-//退出程序前检查是否存在未保存修改，并按用户选择处理
+//退出程序前检查是否存在未保存修改，弹出窗口供用户选择
 void CCADDlg::OnCancel() {
     if (!m_shapeMgr.HasUnsavedChanges()) {
         CDialogEx::OnCancel();

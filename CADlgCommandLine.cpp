@@ -4,15 +4,15 @@
 #include "CADDlg.h"
 
 // 命令解析模块 / command line module
-// `ProcessCommandLine(cmd)`
-// - cmd: 原始命令字符串 / raw command text
+// ProcessCommandLine(cmd)
+// cmd中raw command text
 // - 自动 trim + upper + 去空格 / normalize command text
 
 namespace {
 const SHORT kKeyDownMask = static_cast<SHORT>(0x8000);
 }
 
-// 功能：解析命令行文本并分发到对应命令处理。
+//解析命令行文本并分发
 void CCADDlg::ProcessCommandLine(const CString& cmd) {
     CString normalized = cmd;
     normalized.Trim();
@@ -61,8 +61,6 @@ void CCADDlg::ProcessCommandLine(const CString& cmd) {
         OnBnClickedZoomout();
     } else if (normalized == _T("ZE") || normalized == _T("ZOOMEXTENTS")) {
         OnBnClickedZoomdef();
-    } else if (normalized == _T("PAN") || normalized == _T("P")) {
-        // pan by middle button / 中键平移
     } else if (normalized == _T("REGEN")) {
         RefreshCanvas();
     } else if (normalized == _T("POINTON") || normalized == _T("SHOWPOINT") || normalized == _T("SHOWPOINTS")) {
@@ -78,11 +76,11 @@ void CCADDlg::ProcessCommandLine(const CString& cmd) {
     FocusCommandLine();
 }
 
-// 功能：统一处理快捷键与命令行回车提交。
+//统一处理快捷键与命令行回车提交
 // 交互步骤（keyboard input）：
-// 1) 先拦截 Ctrl+Z / Ctrl+Y / ESC / Delete。
-// 2) 再处理命令行输入框里的 Enter 提交。
-// 3) 最后回落到基类消息流程，保持 MFC 默认行为。
+// 1) 先拦截 Ctrl+Z / Ctrl+Y / ESC / Delete
+// 2) 再处理命令行输入框里的 Enter 提交
+// 3) 最后回落到基类消息流程，保持 MFC 默认行为
 BOOL CCADDlg::PreTranslateMessage(MSG* pMsg) {
     if (pMsg->message == WM_KEYDOWN) {
         if (m_bTextInputActive) {

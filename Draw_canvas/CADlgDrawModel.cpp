@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "../CADDlg.h"
 
-// 功能：绘制当前模型中的全部图元。
+//绘制当前模型中的全部图元
 void CCADDlg::DrawModel(CDC* pDC) {
     if (!pDC) return;
 

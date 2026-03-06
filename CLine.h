@@ -39,7 +39,7 @@ private:
     EntityData m_entityData;
 
 public:
-    // 功能：构造线条对象。
+    //构造线条对象
     CLine();
     void AddPoint(const Point2D& pt);//追加顶点
     void SetSelected(bool sel);//设置选中状态

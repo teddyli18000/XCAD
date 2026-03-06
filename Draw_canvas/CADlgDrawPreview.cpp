@@ -10,7 +10,7 @@ const int kPreviewLineWidth = 1;
 const int kArcPreviewSegments = 72;
 }
 
-// 功能：绘制当前命令的动态预览图形。
+//绘制当前命令的动态预览图形
 void CCADDlg::DrawPreview(CDC* pDC) {
     if (!pDC) return;
 

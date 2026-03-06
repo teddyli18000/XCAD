@@ -7,7 +7,7 @@ const COLORREF kSelectionBoxColor = RGB(255, 255, 255);
 const int kSelectionBoxLineWidth = 1;
 }
 
-// 功能：绘制选择模式下的框选虚线框。
+//绘制选择模式下的框选虚线框
 void CCADDlg::DrawSelection(CDC* pDC) {
     if (!pDC) return;
 

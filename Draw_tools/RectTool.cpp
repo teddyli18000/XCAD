@@ -14,7 +14,6 @@ bool CCADDlg::HandleRectToolLButtonDown(const Point2D& worldPt) {
     } else {
         m_shapeMgr.ExecuteCommand(std::make_unique<CAddLineCommand>(&m_shapeMgr, CreateRectanglePolyline(m_rectFirstPoint, worldPt)));
         m_bRectangleFirstPicked = false;
-        m_bRectangleCommandActive = false;
     }
 
     return true;

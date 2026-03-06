@@ -24,17 +24,17 @@ const double kSmoothTurnThreshold = 0.35;
 const double kSmoothRatioThreshold = 0.85;
 const int kSelectionClickThreshold = 2;
 
-// 功能：判断两个世界坐标点是否可视为同一点。
+// 判断两个世界坐标点是否可视为同一点
 bool IsSamePoint(const Point2D& a, const Point2D& b) {
     return std::fabs(a.x - b.x) <= kPointEpsilon && std::fabs(a.y - b.y) <= kPointEpsilon;
 }
 
-// 功能：判断折线是否为首尾闭合。
+// 判断折线是否为首尾闭合
 bool IsClosedPolyline(const std::vector<Point2D>& pts) {
     return pts.size() >= kMinClosedPolylineSize && IsSamePoint(pts.front(), pts.back());
 }
 
-// 功能：根据点集创建一条基础折线对象。
+// 根据点集创建一条基础折线对象
 std::shared_ptr<CLine> CreateLineFromPoints(const std::vector<Point2D>& pts) {
     if (pts.size() < 2) return nullptr;
     auto line = std::make_shared<CLine>();
@@ -44,7 +44,7 @@ std::shared_ptr<CLine> CreateLineFromPoints(const std::vector<Point2D>& pts) {
     return line;
 }
 
-// 功能：开放折线按命中段切分为左右两段。
+// 开放折线按命中段切分为左右两段 /insert node
 std::vector<std::shared_ptr<CLine>> CreateOpenSplitLines(const std::vector<Point2D>& pts, size_t segEndIndex) {
     std::vector<std::shared_ptr<CLine>> result;
 
@@ -65,7 +65,7 @@ std::vector<std::shared_ptr<CLine>> CreateOpenSplitLines(const std::vector<Point
     return result;
 }
 
-// 功能：闭合折线删除一段后重建保留路径。
+// 闭合折线删除一段后重建保留路径 /for circle or arc
 std::vector<std::shared_ptr<CLine>> CreateClosedSegmentRemovedLine(const std::vector<Point2D>& pts, size_t segEndIndex) {
     std::vector<std::shared_ptr<CLine>> result;
     if (pts.size() < kMinSplitClosedPolylineSize) return result;
@@ -87,7 +87,7 @@ std::vector<std::shared_ptr<CLine>> CreateClosedSegmentRemovedLine(const std::ve
     return result;
 }
 
-// 功能：估计折线是否更接近平滑曲线。
+// 估计折线是否更接近平滑曲线 /for circle or arc when erase
 bool IsSmoothCurvePolyline(const std::vector<Point2D>& pts) {
     if (pts.size() < kSmoothDetectMinPointCount) return false;
 
@@ -120,14 +120,14 @@ bool IsSmoothCurvePolyline(const std::vector<Point2D>& pts) {
 }
 }
 
-// 功能：清空当前所有图元的选中状态。
+//清空当前所有图元的选中状态
 void CCADDlg::ClearSelection() {
-    for (auto& shape : m_shapeMgr.GetShapes()) {
+	for (auto& shape : m_shapeMgr.GetShapes()) { //循环遍历,每次 shape->SetSelected(false)
         shape->SetSelected(false);
     }
 }
 
-// 功能：判断当前是否存在已选中的线条。
+// 判断当前是否存在已选中的线条
 bool CCADDlg::HasSelectedLines() const {
     for (const auto& shape : m_shapeMgr.GetShapes()) {
         if (shape && shape->IsSelected()) {
@@ -137,7 +137,7 @@ bool CCADDlg::HasSelectedLines() const {
     return false;
 }
 
-// 功能：根据框选矩形更新选中图元。
+// 根据框选矩形更新选中图元
 void CCADDlg::ApplySelectionBox() {
     if (m_currentMode != CADMode::MODE_SELECT || m_bEraserCommandActive || m_bDeleteSegmentCommandActive || m_bInsertNodeCommandActive || m_bHatchCommandActive) return;
 
@@ -155,7 +155,7 @@ void CCADDlg::ApplySelectionBox() {
     }
 }
 
-// 功能：删除当前已选中的线条。
+// 删除当前已选中的线条
 void CCADDlg::DeleteSelectedLines() {
     std::vector<std::shared_ptr<CLine>> selected;
     for (const auto& shape : m_shapeMgr.GetShapes()) {
@@ -169,7 +169,7 @@ void CCADDlg::DeleteSelectedLines() {
     RefreshCanvas();
 }
 
-// 功能：在指定位置执行整线擦除或节点删除。
+// 在指定位置执行整线擦除或节点删除
 void CCADDlg::EraseAtPoint(const CPoint& localPt) {
     if (!(m_bEraserCommandActive || m_bDeleteSegmentCommandActive)) return;
 

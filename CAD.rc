@@ -269,7 +269,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ABOUTBOX            "¹ØÓÚ CAD(&A)..."
+    IDS_ABOUTBOX            "关于 XCAD(&A)..."
 END
 
 #endif    // English (United States) resources
@@ -297,4 +297,4 @@ LANGUAGE 9, 1
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-
+#endif

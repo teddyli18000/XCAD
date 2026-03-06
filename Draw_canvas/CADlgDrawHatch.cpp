@@ -10,7 +10,7 @@ const double kPointEqualEpsilon = 1e-9;
 const COLORREF kHatchBorderColor = RGB(0, 0, 0);
 const int kHatchBorderLineWidth = 1;
 
-// 功能：判断图元是否是闭合形状。
+//先判断图元是否是闭合形状
 bool IsClosedShape(const CLine& shape) {
     const auto& pts = shape.GetPoints();
     if (pts.size() < kMinPolygonPointCount) return false;
@@ -19,9 +19,9 @@ bool IsClosedShape(const CLine& shape) {
     return std::fabs(a.x - b.x) <= kPointEqualEpsilon && std::fabs(a.y - b.y) <= kPointEqualEpsilon;
 }
 
-// 功能：射线法判断点是否在多边形内部。
+//射线法判断点是否在多边形内部
 bool PointInPolygon(const std::vector<CPoint>& polygon, const CPoint& p) {
-    if (polygon.size() < kMinPolygonPointCount) return false;
+	if (polygon.size() < kMinPolygonPointCount) return false;//点数小于3无法构成多边形
 
     bool inside = false;
     size_t j = polygon.size() - 1;
@@ -30,6 +30,11 @@ bool PointInPolygon(const std::vector<CPoint>& polygon, const CPoint& p) {
         const CPoint& pj = polygon[j];
 
         if ((pi.y > p.y) != (pj.y > p.y)) {
+            /*
+            边： x = pi.x + t * (pj.x - pi.x)，y = pi.y + t * (pj.y - pi.y)
+            直线：y=p.y，得到t = (p.y - pi.y) / (pj.y - pi.y)
+            代回 x 就得到 intersectX
+            */
             const double intersectX = static_cast<double>(pi.x)
                 + static_cast<double>(pj.x - pi.x) * static_cast<double>(p.y - pi.y)
                 / static_cast<double>(pj.y - pi.y);
@@ -37,14 +42,13 @@ bool PointInPolygon(const std::vector<CPoint>& polygon, const CPoint& p) {
                 inside = !inside;
             }
         }
-
         j = i;
     }
 
     return inside;
 }
 
-// 功能：按绘制顺序从上到下查找命中点所在的闭合图元。
+//按绘制顺序从上到下查找命中点所在的闭合图元
 std::shared_ptr<CLine> FindClosedShapeAtPoint(const CShapeManager& shapeMgr, const CViewTransform& transform, const CPoint& localPt) {
     const auto& shapes = shapeMgr.GetShapes();
     for (auto it = shapes.rbegin(); it != shapes.rend(); ++it) {
@@ -67,7 +71,7 @@ std::shared_ptr<CLine> FindClosedShapeAtPoint(const CShapeManager& shapeMgr, con
 }
 }
 
-// 功能：处理填充工具左键点击，提交填充命令。
+//处理填充工具左键点击，提交填充命令
 bool CCADDlg::HandleHatchToolLButtonDown(const CPoint& localPt) {
     if (!(m_currentMode == CADMode::MODE_SELECT && m_bHatchCommandActive)) return false;
 
@@ -80,7 +84,7 @@ bool CCADDlg::HandleHatchToolLButtonDown(const CPoint& localPt) {
     return true;
 }
 
-// 功能：处理填充工具鼠标移动，更新填充预览状态。
+// 处理填充工具鼠标移动，更新填充预览状态
 bool CCADDlg::HandleHatchToolMouseMove(const CPoint& localPt, bool inCanvas) {
     if (!m_bHatchCommandActive) return false;
 
@@ -93,7 +97,7 @@ bool CCADDlg::HandleHatchToolMouseMove(const CPoint& localPt, bool inCanvas) {
     return true;
 }
 
-// 功能：绘制填充工具预览效果。
+// 绘制填充工具预览效果
 void CCADDlg::DrawHatchPreview(CDC* pDC) {
     if (!pDC || !m_bHatchCommandActive || !m_bHatchPreviewVisible) return;
 

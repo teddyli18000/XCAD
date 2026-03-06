@@ -6,6 +6,7 @@
 #include <memory>
 
 // 图元构造 / shape factory
+// 
 // 参数说明 / params:
 // center:first/second/start/through/end 均为 world 坐标
 // segments 为离散段数 / tessellation count

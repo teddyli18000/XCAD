@@ -198,7 +198,7 @@ void CLine::Draw(CDC* pDC, const CViewTransform& transform, bool bShowPoints) co
     }
 }
 
-//命中测试占位（当前固定返回 false）
+//命中测试（当前固定返回 false）(当前未使用)
 bool CLine::HitTest(const Point2D& pt, double tolerance) const {
     UNREFERENCED_PARAMETER(pt);
     UNREFERENCED_PARAMETER(tolerance);

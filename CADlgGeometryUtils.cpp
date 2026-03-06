@@ -23,14 +23,14 @@ bool IsPointOnSegment(const CPoint& a, const CPoint& b, const CPoint& c) {
 }
 }
 
-// 功能：将角度归一化到 [0, 2π) 区间。
+// 将角度归一化到 [0, 2π) 区间
 double NormalizeAngle(double angle) {
     while (angle < 0.0) angle += kTwoPi;
     while (angle >= kTwoPi) angle -= kTwoPi;
     return angle;
 }
 
-// 功能：计算 from 到 to 的逆时针角距。
+// 计算 from 到 to 的逆时针角距
 double AngleDistanceCCW(double from, double to) {
     const double f = NormalizeAngle(from);
     const double t = NormalizeAngle(to);
@@ -38,19 +38,19 @@ double AngleDistanceCCW(double from, double to) {
     return (kTwoPi - f) + t;
 }
 
-// 功能：把两个角点规范成标准矩形。
+// 把两个角点规范成标准矩形
 CRect NormalizeRect(const CPoint& a, const CPoint& b) {
     CRect rect(a, b);
     rect.NormalizeRect();
     return rect;
 }
 
-// 功能：判断点是否在矩形范围内（含边界）。
+// 判断点是否在矩形范围内（含边界）
 bool IsPointInRect(const CPoint& pt, const CRect& rect) {
     return pt.x >= rect.left && pt.x <= rect.right && pt.y >= rect.top && pt.y <= rect.bottom;
 }
 
-// 功能：判断两条线段是否相交。
+// 判断两条线段是否相交
 bool SegmentsIntersect(const CPoint& p1, const CPoint& p2, const CPoint& q1, const CPoint& q2) {
     const double d1 = CrossValue(p1, p2, q1);
     const double d2 = CrossValue(p1, p2, q2);
@@ -68,7 +68,7 @@ bool SegmentsIntersect(const CPoint& p1, const CPoint& p2, const CPoint& q1, con
     return false;
 }
 
-// 功能：判断折线与矩形是否存在相交或包含关系。
+// 判断折线与矩形是否存在相交或包含关系（未接入）
 bool PolylineIntersectsRect(const CLine& line, const CRect& rect, const CViewTransform& transform) {
     const auto& pts = line.GetPoints();
     if (pts.empty()) return false;
@@ -100,7 +100,7 @@ bool PolylineIntersectsRect(const CLine& line, const CRect& rect, const CViewTra
     return false;
 }
 
-// 功能：计算点到线段的最短距离平方。
+// 计算点到线段的最短距离平方
 double DistancePointToSegmentSquared(const CPoint& p, const CPoint& a, const CPoint& b) {
     const double dx = static_cast<double>(b.x - a.x);
     const double dy = static_cast<double>(b.y - a.y);
@@ -120,7 +120,7 @@ double DistancePointToSegmentSquared(const CPoint& p, const CPoint& a, const CPo
     return ddx * ddx + ddy * ddy;
 }
 
-// 功能：判断折线与圆形区域是否相交。
+// 判断折线与圆形区域是否相交
 bool PolylineIntersectsCircle(const CLine& line, const CPoint& center, int radius, const CViewTransform& transform) {
     const auto& pts = line.GetPoints();
     if (pts.empty()) return false;
@@ -147,5 +147,5 @@ bool PolylineIntersectsCircle(const CLine& line, const CPoint& center, int radiu
     return false;
 }
 
-} // namespace dlg
-} // namespace cad
+}
+} // namespace cad::dlg

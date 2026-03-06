@@ -11,9 +11,9 @@ class CLine;
 class ICadCommand {
 public:
     virtual ~ICadCommand() = default;
-    // 功能：执行命令。
+    //执行命令
     virtual void Execute() = 0;
-    // 功能：撤销命令。
+    //undo
     virtual void Undo() = 0;
 };
 

@@ -8,7 +8,7 @@ const COLORREF kCrosshairColor = RGB(180, 180, 180);
 const int kCrosshairRulerThickness = 20;
 }
 
-// 功能：绘制擦除/删段工具的圆形光标。
+//绘制擦除/删段工具的圆形光标
 void CCADDlg::DrawCursor(CDC* pDC) {
     if (!pDC) return;
 

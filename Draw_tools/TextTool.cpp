@@ -24,7 +24,6 @@ bool CCADDlg::HandleTextToolLButtonDown(const Point2D& worldPt) {
         textShape->SetTextContent(L"");
 
         m_bTextFirstPicked = false;
-        m_bTextCommandActive = false;
         BeginTextInput(textShape);
     }
 

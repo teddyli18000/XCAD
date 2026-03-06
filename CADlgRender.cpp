@@ -33,7 +33,7 @@ const COLORREF kCadColorRulerLine = RGB(150, 150, 150);
 const COLORREF kCadColorRulerText = RGB(220, 220, 220);
 const int kCadRulerThickness = 20;
 
-// 功能：根据按钮 ID 取对应调色板颜色。
+//根据按钮 ID 取对应调色板颜色
 bool TryGetPaletteColor(int ctrlId, COLORREF& color) {
     switch (ctrlId) {
     case IDC_COLOR_WHITE: color = kCadColorWhite; return true;
@@ -48,7 +48,7 @@ bool TryGetPaletteColor(int ctrlId, COLORREF& color) {
 }
 }
 
-// 功能：自绘按钮（颜色按钮与关于图标按钮）。
+// 绘制按钮（颜色按钮与关于图标按钮）
 void CCADDlg::DrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
     COLORREF paletteColor = kCadColorFrameDark;
     if (TryGetPaletteColor(nIDCtl, paletteColor)) {
@@ -122,11 +122,11 @@ void CCADDlg::DrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
     UNREFERENCED_PARAMETER(lpDrawItemStruct);
 }
 
-// 功能：统一绘制 CAD 画布（双缓冲），减少闪烁。
+// 功能：统一绘制 CAD 画布（双缓冲），减少闪烁
 // 交互步骤（OnPaint）：
-// 1) 先在内存 DC 里绘制背景和模型（draw to memory DC）。
-// 2) 再一次性拷贝到屏幕（blit to screen）。
-// 3) 这样界面更稳定，拖动和预览时不会明显闪烁。
+// 1) 先在内存 DC 里绘制背景和模型（draw to memory DC）
+// 2) 再一次性拷贝到屏幕（blit to screen）
+// 3) 这样界面更稳定，拖动和预览时不会明显闪烁
 void CCADDlg::OnPaint() {
     CPaintDC dc(this);
 

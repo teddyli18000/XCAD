@@ -25,7 +25,6 @@ bool CCADDlg::HandleArcToolLButtonDown(const Point2D& worldPt) {
             m_shapeMgr.ExecuteCommand(std::make_unique<CAddLineCommand>(&m_shapeMgr, arc));
         }
         m_arcPointCount = 0;
-        m_bArcCommandActive = false;
     }
 
     return true;
