@@ -8,7 +8,7 @@ const COLORREF kCrosshairColor = RGB(180, 180, 180);
 const int kCrosshairRulerThickness = 20;
 }
 
-// 功能：绘制擦除/删点工具的圆形光标。
+// 功能：绘制擦除/删段工具的圆形光标。
 void CCADDlg::DrawCursor(CDC* pDC) {
     if (!pDC) return;
 
@@ -26,7 +26,7 @@ void CCADDlg::DrawCursor(CDC* pDC) {
         pDC->SelectObject(oldCrossPen);
     }
 
-    if ((m_bEraserCommandActive || m_bDeleteNodeCommandActive) && m_bEraserCursorVisible) {
+    if ((m_bEraserCommandActive || m_bDeleteSegmentCommandActive || m_bInsertNodeCommandActive) && m_bEraserCursorVisible) {
         CPen pen(PS_SOLID, kCursorLineWidth, kCursorColor);
         CPen* oldPen = pDC->SelectObject(&pen);
         CBrush* oldBrush = static_cast<CBrush*>(pDC->SelectStockObject(NULL_BRUSH));

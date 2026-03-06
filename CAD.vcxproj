@@ -217,6 +217,7 @@
     <ClCompile Include="Draw_tools\ArcTool.cpp" />
     <ClCompile Include="Draw_tools\CircleTool.cpp" />
     <ClCompile Include="Draw_tools\EraserTool.cpp" />
+    <ClCompile Include="Draw_tools\InsertNodeTool.cpp" />
     <ClCompile Include="Draw_tools\LineTool.cpp" />
     <ClCompile Include="Draw_tools\RectTool.cpp" />
     <ClCompile Include="Draw_tools\TextTool.cpp" />
@@ -248,4 +249,7 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
+
+
+
 

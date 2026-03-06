@@ -128,6 +128,9 @@
     <ClCompile Include="Draw_tools\EraserTool.cpp">
       <Filter>Draw_tools</Filter>
     </ClCompile>
+    <ClCompile Include="Draw_tools\InsertNodeTool.cpp">
+      <Filter>Draw_tools</Filter>
+    </ClCompile>
     <ClCompile Include="Draw_tools\LineTool.cpp">
       <Filter>Draw_tools</Filter>
     </ClCompile>
@@ -169,4 +172,7 @@
     </Image>
   </ItemGroup>
 </Project>
+
+
+
 

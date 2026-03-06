@@ -86,7 +86,8 @@ BEGIN_MESSAGE_MAP(CCADDlg, CDialogEx)
     ON_BN_CLICKED(IDC_SAVE_AS, &CCADDlg::OnBnClickedSaveAs)
     ON_BN_CLICKED(IDC_UNDO, &CCADDlg::OnBnClickedUndo)
     ON_BN_CLICKED(IDC_REDO, &CCADDlg::OnBnClickedRedo)
-    ON_BN_CLICKED(IDC_DEL_POINT, &CCADDlg::OnBnClickedDelPoint)
+    ON_BN_CLICKED(IDC_DEL_SEGMENT, &CCADDlg::OnBnClickedDelSegment)
+    ON_BN_CLICKED(IDC_INSERT_NODE, &CCADDlg::OnBnClickedInsertNode)
     ON_BN_CLICKED(IDC_DEL_LINE, &CCADDlg::OnBnClickedDelLine)
     ON_BN_CLICKED(IDC_COLOR_WHITE, &CCADDlg::OnBnClickedColorWhite)
     ON_BN_CLICKED(IDC_COLOR_RED, &CCADDlg::OnBnClickedColorRed)
@@ -117,7 +118,8 @@ CCADDlg::CCADDlg(CWnd* pParent)
     , m_bArcCommandActive(false)
     , m_bHatchCommandActive(false)
     , m_bEraserCommandActive(false)
-    , m_bDeleteNodeCommandActive(false)
+    , m_bDeleteSegmentCommandActive(false)
+    , m_bInsertNodeCommandActive(false)
     , m_bHatchPreviewVisible(false)
     , m_bIsSelectingBox(false)
     , m_bIsMovingSelection(false)
@@ -287,8 +289,9 @@ void CCADDlg::UpdateModeButtonHighlight() {
     const bool hatchActive = (m_currentMode == CADMode::MODE_SELECT && m_bHatchCommandActive);
     const bool drawModeActive = lineActive || circleActive || rectActive || textActive || arcActive || hatchActive;
     const bool eraseActive = (m_currentMode == CADMode::MODE_SELECT && m_bEraserCommandActive);
-    const bool deleteNodeActive = (m_currentMode == CADMode::MODE_SELECT && m_bDeleteNodeCommandActive);
-    const bool selectModeActive = (m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteNodeCommandActive && !m_bHatchCommandActive);
+    const bool deleteSegmentActive = (m_currentMode == CADMode::MODE_SELECT && m_bDeleteSegmentCommandActive);
+    const bool insertNodeActive = (m_currentMode == CADMode::MODE_SELECT && m_bInsertNodeCommandActive);
+    const bool selectModeActive = (m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteSegmentCommandActive && !m_bInsertNodeCommandActive && !m_bHatchCommandActive);
 
     SetButtonPushedState(this, IDC_DRAW, drawModeActive);
     SetButtonPushedState(this, IDC_DRAW_LINE, lineActive);
@@ -297,7 +300,8 @@ void CCADDlg::UpdateModeButtonHighlight() {
     SetButtonPushedState(this, IDC_DRAW_TEXT, textActive);
     SetButtonPushedState(this, IDC_DRAW_ARC, arcActive);
     SetButtonPushedState(this, IDC_HATCH, hatchActive);
-    SetButtonPushedState(this, IDC_DEL_POINT, deleteNodeActive);
+    SetButtonPushedState(this, IDC_DEL_SEGMENT, deleteSegmentActive);
+    SetButtonPushedState(this, IDC_INSERT_NODE, insertNodeActive);
     SetButtonPushedState(this, IDC_SEL, selectModeActive);
     SetButtonPushedState(this, IDC_DEL_LINE, eraseActive);
 }
@@ -348,7 +352,8 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
     m_bArcCommandActive = false;
     m_bHatchCommandActive = false;
     m_bEraserCommandActive = false;
-    m_bDeleteNodeCommandActive = false;
+    m_bDeleteSegmentCommandActive = false;
+    m_bInsertNodeCommandActive = false;
     m_bHatchPreviewVisible = false;
     m_bIsSelectingBox = false;
     m_bIsErasing = false;
@@ -378,9 +383,12 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
     } else if (commandType == CADCommandType::ERASER) {
         m_currentMode = CADMode::MODE_SELECT;
         m_bEraserCommandActive = true;
-    } else if (commandType == CADCommandType::DELETE_NODE) {
+    } else if (commandType == CADCommandType::DELETE_SEGMENT) {
         m_currentMode = CADMode::MODE_SELECT;
-        m_bDeleteNodeCommandActive = true;
+        m_bDeleteSegmentCommandActive = true;
+    } else if (commandType == CADCommandType::INSERT_NODE) {
+        m_currentMode = CADMode::MODE_SELECT;
+        m_bInsertNodeCommandActive = true;
     }
 
     UpdateModeButtonHighlight();
@@ -603,9 +611,14 @@ void CCADDlg::OnBnClickedDelLine() {
     ActivateCommand(CADCommandType::ERASER);
 }
 
-//激活节点删除命令
-void CCADDlg::OnBnClickedDelPoint() {
-    ActivateCommand(CADCommandType::DELETE_NODE);
+//激活线段删除命令
+void CCADDlg::OnBnClickedDelSegment() {
+    ActivateCommand(CADCommandType::DELETE_SEGMENT);
+}
+
+//激活插入节点命令
+void CCADDlg::OnBnClickedInsertNode() {
+    ActivateCommand(CADCommandType::INSERT_NODE);
 }
 
 //给选中线条应用颜色，或更新填充预览颜色

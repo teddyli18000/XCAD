@@ -3,7 +3,7 @@
 
 // 功能：开始擦除/删点流程并立即执行一次命中处理。
 bool CCADDlg::HandleEraserToolLButtonDown(const CPoint& localPt) {
-    if (!(m_currentMode == CADMode::MODE_SELECT && (m_bEraserCommandActive || m_bDeleteNodeCommandActive))) return false;
+    if (!(m_currentMode == CADMode::MODE_SELECT && (m_bEraserCommandActive || m_bDeleteSegmentCommandActive))) return false;
 
     m_bIsErasing = true;
     m_eraserCursor = localPt;
@@ -15,7 +15,7 @@ bool CCADDlg::HandleEraserToolLButtonDown(const CPoint& localPt) {
 
 // 功能：更新橡皮擦光标位置，并在拖动时持续擦除。
 bool CCADDlg::HandleEraserToolMouseMove(UINT nFlags, const CPoint& localPt, bool inCanvas) {
-    if (!(m_bEraserCommandActive || m_bDeleteNodeCommandActive)) return false;
+    if (!(m_bEraserCommandActive || m_bDeleteSegmentCommandActive)) return false;
 
     m_bEraserCursorVisible = inCanvas;
     if (inCanvas) {
@@ -29,7 +29,7 @@ bool CCADDlg::HandleEraserToolMouseMove(UINT nFlags, const CPoint& localPt, bool
 
 // 功能：结束擦除流程并释放鼠标捕获。
 bool CCADDlg::HandleEraserToolLButtonUp() {
-    if (!((m_bEraserCommandActive || m_bDeleteNodeCommandActive) && m_bIsErasing)) return false;
+    if (!((m_bEraserCommandActive || m_bDeleteSegmentCommandActive) && m_bIsErasing)) return false;
 
     m_bIsErasing = false;
     if (GetCapture() == this) {

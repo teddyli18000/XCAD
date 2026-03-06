@@ -9,7 +9,7 @@ const double kMoveEpsilon = 1e-9;
 
 //开始框选流程，记录起始点并捕获鼠标
 bool CCADDlg::HandleSelectionToolLButtonDown(const CPoint& localPt) {
-    if (!(m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteNodeCommandActive && !m_bHatchCommandActive)) return false;
+    if (!(m_currentMode == CADMode::MODE_SELECT && !m_bEraserCommandActive && !m_bDeleteSegmentCommandActive && !m_bInsertNodeCommandActive && !m_bHatchCommandActive)) return false;
 
     if (HasSelectedLines()) {
         m_bIsMovingSelection = true;

@@ -23,7 +23,8 @@ enum class CADCommandType {
     ARC,
     HATCH,
     ERASER,
-    DELETE_NODE
+    DELETE_SEGMENT,
+    INSERT_NODE
 };
 
 
@@ -59,7 +60,8 @@ protected:
     bool m_bArcCommandActive;
     bool m_bHatchCommandActive;
     bool m_bEraserCommandActive;
-    bool m_bDeleteNodeCommandActive;
+    bool m_bDeleteSegmentCommandActive;
+    bool m_bInsertNodeCommandActive;
     bool m_bHatchPreviewVisible;
     bool m_bIsSelectingBox;
     bool m_bIsMovingSelection;
@@ -137,7 +139,8 @@ protected:
 	afx_msg void OnBnClickedRedo();
 	afx_msg void OnBnClickedAboutIcon();
 	afx_msg void OnBnClickedDelLine();
-	afx_msg void OnBnClickedDelPoint();
+	afx_msg void OnBnClickedDelSegment();
+	afx_msg void OnBnClickedInsertNode();
 	afx_msg void OnBnClickedColorWhite();
 	afx_msg void OnBnClickedColorRed();
 	afx_msg void OnBnClickedColorYellow();
@@ -166,6 +169,7 @@ protected:
 	void DeleteSelectedLines();
 	void ApplyColorToSelectedLines(COLORREF color);
 	void EraseAtPoint(const CPoint& localPt);
+	void InsertNodeAtPoint(const CPoint& localPt);
 	void DrawModel(CDC* pDC);
 	void DrawPreview(CDC* pDC);
 	void DrawHatchPreview(CDC* pDC);
@@ -192,6 +196,8 @@ protected:
 	bool HandleEraserToolLButtonDown(const CPoint& localPt);
 	bool HandleEraserToolMouseMove(UINT nFlags, const CPoint& localPt, bool inCanvas);
 	bool HandleEraserToolLButtonUp();
+	bool HandleInsertNodeToolLButtonDown(const CPoint& localPt);
+	bool HandleInsertNodeToolMouseMove(const CPoint& localPt, bool inCanvas);
 	void UpdateModeButtonHighlight();
 
 	DECLARE_MESSAGE_MAP()

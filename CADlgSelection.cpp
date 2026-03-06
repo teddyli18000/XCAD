@@ -139,7 +139,7 @@ bool CCADDlg::HasSelectedLines() const {
 
 // 功能：根据框选矩形更新选中图元。
 void CCADDlg::ApplySelectionBox() {
-    if (m_currentMode != CADMode::MODE_SELECT || m_bEraserCommandActive || m_bDeleteNodeCommandActive || m_bHatchCommandActive) return;
+    if (m_currentMode != CADMode::MODE_SELECT || m_bEraserCommandActive || m_bDeleteSegmentCommandActive || m_bInsertNodeCommandActive || m_bHatchCommandActive) return;
 
     const CRect box = cad::dlg::NormalizeRect(m_selectBoxStart, m_selectBoxEnd);
     if (box.Width() < kSelectionClickThreshold && box.Height() < kSelectionClickThreshold) {
@@ -171,7 +171,7 @@ void CCADDlg::DeleteSelectedLines() {
 
 // 功能：在指定位置执行整线擦除或节点删除。
 void CCADDlg::EraseAtPoint(const CPoint& localPt) {
-    if (!(m_bEraserCommandActive || m_bDeleteNodeCommandActive)) return;
+    if (!(m_bEraserCommandActive || m_bDeleteSegmentCommandActive)) return;
 
     if (m_bEraserCommandActive) {
         std::vector<std::shared_ptr<CLine>> hits;

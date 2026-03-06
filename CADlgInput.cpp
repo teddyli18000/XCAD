@@ -54,7 +54,9 @@ void CCADDlg::OnLButtonDown(UINT nFlags, CPoint point) {
         if (m_bHatchCommandActive) {
             handled = HandleHatchToolLButtonDown(localPt);
         } else {
-            if (m_bEraserCommandActive || m_bDeleteNodeCommandActive) {
+            if (m_bInsertNodeCommandActive) {
+                handled = HandleInsertNodeToolLButtonDown(localPt);
+            } else if (m_bEraserCommandActive || m_bDeleteSegmentCommandActive) {
                 handled = HandleEraserToolLButtonDown(localPt);
             } else {
                 handled = HandleSelectionToolLButtonDown(localPt);
@@ -104,6 +106,7 @@ void CCADDlg::OnMouseMove(UINT nFlags, CPoint point) {
         || HandleArcToolMouseMove(worldPt)
         || HandleHatchToolMouseMove(localPt, inCanvas)
         || HandleEraserToolMouseMove(nFlags, localPt, inCanvas)
+        || HandleInsertNodeToolMouseMove(localPt, inCanvas)
         || HandleSelectionToolMouseMove(localPt)) {
         RefreshCanvas();
         return;
@@ -216,7 +219,8 @@ void CCADDlg::CancelCurrentDrawing() {
     m_bArcCommandActive = false;
     m_bHatchCommandActive = false;
     m_bEraserCommandActive = false;
-    m_bDeleteNodeCommandActive = false;
+    m_bDeleteSegmentCommandActive = false;
+    m_bInsertNodeCommandActive = false;
     m_bHatchPreviewVisible = false;
     m_bIsSelectingBox = false;
     m_bIsMovingSelection = false;
@@ -259,7 +263,8 @@ void CCADDlg::CancelActiveCommand() {
     m_bArcCommandActive = false;
     m_bHatchCommandActive = false;
     m_bEraserCommandActive = false;
-    m_bDeleteNodeCommandActive = false;
+    m_bDeleteSegmentCommandActive = false;
+    m_bInsertNodeCommandActive = false;
     m_bHatchPreviewVisible = false;
     m_bIsSelectingBox = false;
     m_bIsMovingSelection = false;

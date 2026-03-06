@@ -17,7 +17,7 @@
 #define IDC_SAVE_AS                     1008
 #define IDC_DRAW                        1009
 #define IDC_SEL                         1010
-#define IDC_DEL_POINT                   1011
+#define IDC_DEL_SEGMENT                 1011
 #define IDC_DEL_LINE                    1012
 #define IDC_VIEW_POINT                  1013
 #define IDC_HIDE_POINT                  1014
@@ -46,6 +46,7 @@
 #define IDC_DRAW_TEXT                   1037
 #define IDC_FILE_PATH_INFO              1038
 #define IDC_FILE_SIZE_INFO              1039
+#define IDC_INSERT_NODE                 1040
 #define IDC_TEXT_INLINE_EDIT            1100
 
 // Next default values for new objects
@@ -54,7 +55,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1040
+#define _APS_NEXT_CONTROL_VALUE         1041
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
