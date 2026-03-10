@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -221,6 +221,7 @@
     <ClCompile Include="Draw_tools\LineTool.cpp" />
     <ClCompile Include="Draw_tools\RectTool.cpp" />
     <ClCompile Include="Draw_tools\TextTool.cpp" />
+    <ClCompile Include="Draw_tools\TriangleTool.cpp" />
     <ClCompile Include="Draw_tools\SelectionTool.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

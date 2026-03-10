@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "../CADDlg.h"
 
 #include <cmath>
@@ -80,6 +80,29 @@ void CCADDlg::DrawPreview(CDC* pDC) {
 
         pDC->SetBkMode(oldBkMode);
         pDC->SelectObject(oldBrush);
+        pDC->SelectObject(oldPen);
+    }
+
+    if (m_bTriangleCommandActive && m_bTriangleFirstPicked) {
+        CPoint p1 = m_transform.WorldToScreen(m_triangleFirstPoint);
+        CPoint p3 = m_transform.WorldToScreen(m_trianglePreviewPoint);
+
+        CPen dashPen(PS_DASH, kPreviewLineWidth, kPreviewDashColor);
+        CPen* oldPen = pDC->SelectObject(&dashPen);
+        int oldBkMode = pDC->SetBkMode(TRANSPARENT);
+
+        if (m_bTriangleSecondPicked) {
+            CPoint p2 = m_transform.WorldToScreen(m_triangleSecondPoint);
+            pDC->MoveTo(p1);
+            pDC->LineTo(p2);
+            pDC->LineTo(p3);
+            pDC->LineTo(p1);
+        } else {
+            pDC->MoveTo(p1);
+            pDC->LineTo(p3);
+        }
+
+        pDC->SetBkMode(oldBkMode);
         pDC->SelectObject(oldPen);
     }
 

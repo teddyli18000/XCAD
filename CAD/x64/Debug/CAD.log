@@ -1,0 +1,4 @@
+﻿  CADlgInput.cpp
+CADlgInput.obj : error LNK2019: 无法解析的外部符号 "protected: bool __cdecl CCADDlg::HandleTriangleToolLButtonDown(struct Point2D const &)" (?HandleTriangleToolLButtonDown@CCADDlg@@IEAA_NAEBUPoint2D@@@Z)，函数 "protected: void __cdecl CCADDlg::OnLButtonDown(unsigned int,class CPoint)" (?OnLButtonDown@CCADDlg@@IEAAXIVCPoint@@@Z) 中引用了该符号
+CADlgInput.obj : error LNK2019: 无法解析的外部符号 "protected: bool __cdecl CCADDlg::HandleTriangleToolMouseMove(struct Point2D const &)" (?HandleTriangleToolMouseMove@CCADDlg@@IEAA_NAEBUPoint2D@@@Z)，函数 "protected: void __cdecl CCADDlg::OnMouseMove(unsigned int,class CPoint)" (?OnMouseMove@CCADDlg@@IEAAXIVCPoint@@@Z) 中引用了该符号
+C:\Users\admin\Desktop\XCAD-master\x64\Debug\CAD.exe : fatal error LNK1120: 2 个无法解析的外部命令

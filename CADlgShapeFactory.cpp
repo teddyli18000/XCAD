@@ -126,3 +126,15 @@ std::shared_ptr<CLine> CCADDlg::CreateArcPolylineByThreePoints(const Point2D& st
 
     return arc;
 }
+
+std::shared_ptr<CLine> CCADDlg::CreateTrianglePolyline(const Point2D& first, const Point2D& second, const Point2D& third) const {
+    std::shared_ptr<CLine> triangle = std::make_shared<CLine>();
+    triangle->SetEntityType(EntityType::TRIANGLE);
+    
+    triangle->AddPoint(first);
+    triangle->AddPoint(second);
+    triangle->AddPoint(third);
+    triangle->AddPoint(first);
+    
+    return triangle;
+}

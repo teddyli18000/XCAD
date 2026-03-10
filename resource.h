@@ -47,6 +47,7 @@
 #define IDC_FILE_PATH_INFO              1038
 #define IDC_FILE_SIZE_INFO              1039
 #define IDC_INSERT_NODE                 1040
+#define IDC_DRAW_TRIANGLE				1041
 #define IDC_TEXT_INLINE_EDIT            1100
 
 // Next default values for new objects

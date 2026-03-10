@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "CShapeManager.h"
 #include <algorithm>
 #include <cctype>
@@ -84,6 +84,7 @@ int EntityTypeToInt(EntityType type) {
     case EntityType::CIRCLE: return 1;
     case EntityType::ARC: return 2;
     case EntityType::RECTANGLE: return 3;
+    case EntityType::TRIANGLE: return 4;
     default: return 0;
     }
 }
@@ -95,6 +96,7 @@ EntityType IntToEntityType(int value) {
     case 1: return EntityType::CIRCLE;
     case 2: return EntityType::ARC;
     case 3: return EntityType::RECTANGLE;
+    case 4: return EntityType::TRIANGLE;
     case 0:
     default:
         return EntityType::LINE;

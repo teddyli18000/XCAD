@@ -41,6 +41,8 @@ void CCADDlg::OnLButtonDown(UINT nFlags, CPoint point) {
     if (m_currentMode == CADMode::MODE_DRAW) {
         if (m_bLineCommandActive) {
             handled = HandleLineToolLButtonDown(worldPt);
+        } else if (m_bTriangleCommandActive) {
+            handled = HandleTriangleToolLButtonDown(worldPt);
         } else if (m_bCircleCommandActive) {
             handled = HandleCircleToolLButtonDown(worldPt);
         } else if (m_bRectangleCommandActive) {
@@ -100,6 +102,7 @@ void CCADDlg::OnMouseMove(UINT nFlags, CPoint point) {
     }
 
     if (HandleLineToolMouseMove(worldPt)
+        || HandleTriangleToolMouseMove(worldPt)
         || HandleCircleToolMouseMove(worldPt)
         || HandleRectToolMouseMove(worldPt)
         || HandleTextToolMouseMove(worldPt)
@@ -194,6 +197,7 @@ void CCADDlg::FinishCurrentDrawing(bool keepCommandActive) {
     m_bIsDrawing = false;
     m_pCurrentLine.reset();
     m_bLineCommandActive = keepCommandActive;
+    m_bTriangleCommandActive = false;
     m_bCircleCommandActive = false;
     m_bCircleCenterPicked = false;
     m_bRectangleCommandActive = false;
@@ -212,6 +216,9 @@ void CCADDlg::CancelCurrentDrawing() {
     CommitTextInput(false);
     m_bIsDrawing = false;
     m_bLineCommandActive = false;
+    m_bTriangleCommandActive = false;
+    m_bTriangleFirstPicked = false;
+    m_bTriangleSecondPicked = false;
     m_bCircleCommandActive = false;
     m_bCircleCenterPicked = false;
     m_bRectangleCommandActive = false;
@@ -256,6 +263,9 @@ void CCADDlg::CancelActiveCommand() {
     m_bIsDrawing = false;
     m_pCurrentLine.reset();
     m_bLineCommandActive = false;
+    m_bTriangleCommandActive = false;
+    m_bTriangleFirstPicked = false;
+    m_bTriangleSecondPicked = false;
     m_bCircleCommandActive = false;
     m_bCircleCenterPicked = false;
     m_bRectangleCommandActive = false;

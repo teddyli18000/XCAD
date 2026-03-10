@@ -74,6 +74,7 @@ BEGIN_MESSAGE_MAP(CCADDlg, CDialogEx)
     ON_WM_MOUSEWHEEL()
     ON_BN_CLICKED(IDC_DRAW, &CCADDlg::OnBnClickedDraw)
     ON_BN_CLICKED(IDC_DRAW_LINE, &CCADDlg::OnBnClickedDraw)
+    ON_BN_CLICKED(IDC_DRAW_TRIANGLE, &CCADDlg::OnBnClickedTriangle)
     ON_BN_CLICKED(IDC_DRAW_CIRCLE, &CCADDlg::OnBnClickedCircle)
     ON_BN_CLICKED(IDC_DRAW_RECT, &CCADDlg::OnBnClickedRectangle)
     ON_BN_CLICKED(IDC_DRAW_TEXT, &CCADDlg::OnBnClickedText)
@@ -117,6 +118,9 @@ CCADDlg::CCADDlg(CWnd* pParent)
     , m_bIsPanning(false)
     , m_bShowPoints(true)
     , m_bLineCommandActive(false)
+    , m_bTriangleCommandActive(false)
+    , m_bTriangleFirstPicked(false)
+    , m_bTriangleSecondPicked(false)
     , m_bCircleCommandActive(false)
     , m_bCircleCenterPicked(false)
     , m_bRectangleCommandActive(false)
@@ -143,6 +147,9 @@ CCADDlg::CCADDlg(CWnd* pParent)
     , m_eraserCursor(0, 0)
     , m_mouseCanvasPt(0, 0)
     , m_hatchPreviewPoint(0, 0)
+    , m_triangleFirstPoint(0.0, 0.0)
+    , m_triangleSecondPoint(0.0, 0.0)
+    , m_trianglePreviewPoint(0.0, 0.0)
     , m_circleCenter(0.0, 0.0)
     , m_circlePreviewPoint(0.0, 0.0)
     , m_rectFirstPoint(0.0, 0.0)
@@ -292,6 +299,7 @@ void CCADDlg::UpdateFileInfoLayout() {
 //根据当前命令状态更新按钮高亮显示
 void CCADDlg::UpdateModeButtonHighlight() {
     const bool lineActive = (m_currentMode == CADMode::MODE_DRAW && m_bLineCommandActive);
+    const bool triangleActive = (m_currentMode == CADMode::MODE_DRAW && m_bTriangleCommandActive);
     const bool circleActive = (m_currentMode == CADMode::MODE_DRAW && m_bCircleCommandActive);
     const bool rectActive = (m_currentMode == CADMode::MODE_DRAW && m_bRectangleCommandActive);
     const bool textActive = (m_currentMode == CADMode::MODE_DRAW && m_bTextCommandActive);
@@ -305,6 +313,7 @@ void CCADDlg::UpdateModeButtonHighlight() {
 
     SetButtonPushedState(this, IDC_DRAW, drawModeActive);
     SetButtonPushedState(this, IDC_DRAW_LINE, lineActive);
+    SetButtonPushedState(this, IDC_DRAW_TRIANGLE, triangleActive);
     SetButtonPushedState(this, IDC_DRAW_CIRCLE, circleActive);
     SetButtonPushedState(this, IDC_DRAW_RECT, rectActive);
     SetButtonPushedState(this, IDC_DRAW_TEXT, textActive);
@@ -353,6 +362,9 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
     CommitTextInput(true);
     ClearSelection();
     m_bLineCommandActive = false;
+    m_bTriangleCommandActive = false;
+    m_bTriangleFirstPicked = false;
+    m_bTriangleSecondPicked = false;
     m_bCircleCommandActive = false;
     m_bCircleCenterPicked = false;
     m_bRectangleCommandActive = false;
@@ -375,6 +387,9 @@ void CCADDlg::ActivateCommand(CADCommandType commandType) {
     if (commandType == CADCommandType::LINE) {
         m_currentMode = CADMode::MODE_DRAW;
         m_bLineCommandActive = true;
+    } else if (commandType == CADCommandType::TRIANGLE) {
+        m_currentMode = CADMode::MODE_DRAW;
+        m_bTriangleCommandActive = true;
     } else if (commandType == CADCommandType::CIRCLE) {
         m_currentMode = CADMode::MODE_DRAW;
         m_bCircleCommandActive = true;
@@ -439,6 +454,11 @@ bool CCADDlg::SaveAsWithDialog() {
 //激活line绘制命令
 void CCADDlg::OnBnClickedDraw() {
     ActivateCommand(CADCommandType::LINE);
+}
+
+//激活triangle绘制命令
+void CCADDlg::OnBnClickedTriangle() {
+    ActivateCommand(CADCommandType::TRIANGLE);
 }
 
 //激活circle绘制命令

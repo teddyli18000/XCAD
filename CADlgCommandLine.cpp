@@ -23,6 +23,8 @@ void CCADDlg::ProcessCommandLine(const CString& cmd) {
 
     if (normalized == _T("L") || normalized == _T("LINE") || normalized == _T("PL") || normalized == _T("PLINE")) {
         ActivateCommand(CADCommandType::LINE);
+    } else if (normalized == _T("TRI") || normalized == _T("TRIANGLE")) {
+        ActivateCommand(CADCommandType::TRIANGLE);
     } else if (normalized == _T("C") || normalized == _T("CIRCLE")) {
         ActivateCommand(CADCommandType::CIRCLE);
     } else if (normalized == _T("REC") || normalized == _T("RECT") || normalized == _T("RECTANGLE") || normalized == _T("RECTANG")) {

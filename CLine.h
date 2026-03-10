@@ -11,7 +11,8 @@ enum class EntityType {
     LINE,
     CIRCLE,
     ARC,
-    RECTANGLE
+    RECTANGLE,
+    TRIANGLE
 };
 
 struct EntityData {
